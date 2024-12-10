@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quan Ly Hoc Sinh</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="left-section">
+      <div class="navbar__toggle" id="sidebar">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+      <a class="header__logo" href="#">
+        <img src="{% static 'images/logo.webp' %}">
+        <h1>Quan Ly Hoc Sinh</h1>
+      </a>
+    </div>
+    <div class="middle-section">
+    </div>
+    <div class="right-section">
+      <div class="message-icon-container">
+        <img src="{% static 'images/message.png' %}" class="message-icon">
+        <div class="tooltip">Tin nhắn</div>
+        <!-- <div class="message-count">3</div> -->
+      </div>
+      <div class="notification-icon-container">
+        <img src="{% static 'images/notification.jpg' %}" class="notification-icon">
+        <div class="tooltip">Thông báo</div>
+        <!-- <div class="notification-count">2</div> -->
+      </div>
+      <nav class="header-menu">
+        <div class="user-menu">
+          <a href="#">
+            <div class="avatar">
+              <img src="{% static 'images/user.png' %}">
+            </div>
+            <button class="dropdown-button">
+              <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32">
+                <title>chevron-down</title>
+                <path d="M16 21l-13-13h-3l16 16 16-16h-3l-13 13z"></path>
+              </svg>
+            </button>
+          </a>
+        </div>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-link">
+            <img width="20" height="20" viewBox="0 0 32 32" src="{% static 'images/edit.png' %}">
+            &nbspThông tin cá nhân
+          </a>
+          <a href="#" class="dropdown-link">
+            <img width="20" height="20" viewBox="0 0 32 32" src="{% static 'images/logout.png' %}">
+            &nbspĐăng xuất
+          </a>
+        </div>
+      </nav>
+
+      <!-- <button class="login">
+        Đăng nhập
+      </button> -->
+
+    </div>
+
+
+  </header>
+  <nav class="sidebar">
+    <header>
+      <img src="{% static 'images/user.png' %}">
+      <a href="#">
+        <h1>{{ user.username }}</h1>
+      </a>
+    </header>
+    <a href="#" class="sidebar-link">
+      <img src="{% static 'images/home.png' %}">
+      Trang chủ
+    </a>
+    <a href="#" class="sidebar-link">   <!--DS học sinh-->
+      <img src="{% static 'images/student.png' %}">
+      Học sinh
+    </a>
+    <a href="#" class="sidebar-link">
+      <img src="{% static 'images/class.png' %}">
+      Lớp học
+    </a>
+    <a href="#" class="sidebar-link">   <!--Môn học-->
+      <img src="{% static 'images/book.png' %}">
+      Môn học
+    </a>
+    <a href="#" class="sidebar-link">
+      <img src="{% static 'images/settings.png' %}">
+      Cài đặt
+    </a>
+  </nav>
+
+  <main class="list-container">
+      {% block content %}
+
+      {% endblock %}
+  </main>
+  
+  <script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>
