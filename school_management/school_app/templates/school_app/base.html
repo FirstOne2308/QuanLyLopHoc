@@ -56,7 +56,7 @@
             <img width="20" height="20" viewBox="0 0 32 32" src="{% static 'images/edit.png' %}">
             &nbspThông tin cá nhân
           </a>
-          <a href="#" class="dropdown-link">
+          <a href="{% url 'dang-xuat'%}" class="dropdown-link">
             <img width="20" height="20" viewBox="0 0 32 32" src="{% static 'images/logout.png' %}">
             &nbspĐăng xuất
           </a>
@@ -78,38 +78,70 @@
         <h1>{{ user.username }}</h1>
       </a>
     </header>
+    {% if user.vai_tro == '1' %}
+    <!-- Hiển thị tất cả các mục -->
     <a href="#" class="sidebar-link">
-      <img src="{% static 'images/home.png' %}">
-      Trang chủ
+        <img src="{% static 'images/home.png' %}">
+        Trang chủ
     </a>
-    <a href="#" class="sidebar-link">   <!--DS giáo viên -->
-      <img src="{% static 'images/teacher.png' %}">
-      Giáo viên
+    <a href="{%url 'ds-giao-vien'%}" class="sidebar-link">
+        <img src="{% static 'images/teacher.png' %}">
+        Giáo viên
     </a>
-    <a href="#" class="sidebar-link">   <!--DS học sinh-->
-      <img src="{% static 'images/student.png' %}">
-      Học sinh
+    <a href="{%url 'hoc-sinh'%}" class="sidebar-link">
+        <img src="{% static 'images/student.png' %}">
+        Học sinh
     </a>
-    <a href="#" class="sidebar-link">
-      <img src="{% static 'images/class.png' %}">
-      Lớp học
+    <a href="{%url 'lop-hoc'%}" class="sidebar-link">
+        <img src="{% static 'images/class.png' %}">
+        Lớp học
     </a>
-    <a href="#" class="sidebar-link">   <!--Môn học-->
-      <img src="{% static 'images/book.png' %}">
-      Môn học
+    <a href="{%url 'mon-hoc'%}" class="sidebar-link">
+        <img src="{% static 'images/book.png' %}">
+        Môn học
     </a>
-    <a href="#" class="sidebar-link">
-      <img src="{% static 'images/report.png' %}">
-      Báo cáo tổng kết
-    </a>
-    <a href="#" class="sidebar-link">
-      <img src="{% static 'images/search.png' %}">
-      Tra cứu học sinh
+    <a href="{%url 'diem'%}" class="sidebar-link">
+        <img src="{% static 'images/report.png' %}">
+        Điểm
     </a>
     <a href="#" class="sidebar-link">
-      <img src="{% static 'images/settings.png' %}">
-      Cài đặt
+        <img src="{% static 'images/search.png' %}">
+        Báo cáo tổng kết
     </a>
+    <a href="#" class="sidebar-link">
+        <img src="{% static 'images/settings.png' %}">
+        Cài đặt
+    </a>
+{% elif user.vai_tro == '3' %}
+    <!-- Hiển thị các mục phù hợp với vai_tro = 1 -->
+    <a href="#" class="sidebar-link">
+        <img src="{% static 'images/home.png' %}">
+        Trang chủ
+    </a>
+    <a href="#" class="sidebar-link">
+        <img src="{% static 'images/student.png' %}">
+        Học sinh
+    </a>
+    <a href="#" class="sidebar-link">
+        <img src="{% static 'images/class.png' %}">
+        Lớp học
+    </a>
+    <a href="{%url 'mon-hoc'%}" class="sidebar-link">
+        <img src="{% static 'images/book.png' %}">
+        Môn học
+    </a>
+    <a href="#" class="sidebar-link">
+        <img src="{% static 'images/settings.png' %}">
+        Cài đặt
+    </a>
+{% else %}
+    <!-- Trường hợp không xác định -->
+    <a href="#" class="sidebar-link">
+        <img src="{% static 'images/home.png' %}">
+        Trang chủ
+    </a>
+{% endif %}
+
   </nav>
 
   <main class="list-container">

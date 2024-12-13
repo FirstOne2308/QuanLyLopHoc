@@ -1,0 +1,68 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+  <div class="them-hoc-sinh-container">
+    <h2>Cập nhật học sinh</h2>
+
+    <!-- Hiển thị thông báo -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                {% if 'add_student' in message.tags %}
+                    <div class="alert {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Form cập nhật học sinh -->
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="input_field">
+            <label for="username">Username</label>
+            {{ form.username }}  <!-- Hiển thị trường username -->
+        </div>
+        <div class="input_field">
+            <label for="password">Mật khẩukhẩu</label>
+            {{ form.password }}  <!-- Hiển thị trường username -->
+        </div>
+    
+        <div class="input_field">
+            <label for="name">Họ và tên</label>
+            {{ form.ho_ten }}  <!-- Hiển thị trường họ tên -->
+        </div>
+    
+        <div class="input_field">
+            <label for="dateOfBirth">Ngày sinh</label>
+            {{ form.ngay_sinh }}  <!-- Hiển thị trường ngày sinh -->
+        </div>
+    
+        <div class="input_field">
+            <label for="sex">Giới tính</label>
+            {{ form.gioi_tinh }}  <!-- Hiển thị trường giới tính -->
+        </div>
+    
+        <div class="input_field">
+            <label for="email">Email</label>
+            {{ form.email }}  <!-- Hiển thị trường email -->
+        </div>
+    
+        <div class="input_field">
+            <label for="address">Địa chỉ</label>
+            {{ form.dia_chi }}  <!-- Hiển thị trường địa chỉ -->
+        </div>
+    
+        <div class="input_field">
+            <button type="submit" class="btn-submit">Lưu</button>
+        </div>
+    </form>
+
+    <!-- Nút Thoát -->
+    <a href="{% url 'hoc-sinh' %}">
+        <button type="button" class="btn-cancel">Thoát</button>
+    </a>
+  </div>
+{% endblock %}

@@ -72,7 +72,7 @@ class NamHoc(models.Model):
 # Lớp học
 class LopHoc(models.Model):
     ma_lop = models.CharField(max_length=10, null=False, unique=False)
-    so_hoc_sinh = models.IntegerField(null=False)
+    so_hoc_sinh = models.IntegerField(null=True)
     nam_hoc = models.ForeignKey(
         NamHoc, null=False, on_delete=models.CASCADE)
 
@@ -85,7 +85,6 @@ class MonHoc(models.Model):
     ma_mon = models.CharField(max_length=200, null=False, unique=True)
     ten_mon = models.CharField(max_length=200, null=False, unique=True)
     diem_chuan = models.FloatField(null=False)
-    nam_hoc = models.ForeignKey(NamHoc, null=False, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.ten_mon
@@ -112,7 +111,7 @@ class HocSinh(models.Model):
 class GiaoVien(models.Model):
     nguoi_dung = models.OneToOneField(NguoiDung, on_delete=models.CASCADE)
     mon_day = models.ForeignKey(MonHoc, blank=True, on_delete=models.CASCADE)
-
+    lop_day = models.ManyToManyField(LopHoc, blank=True)
     def __str__(self):
         return self.nguoi_dung.username
 
@@ -125,33 +124,35 @@ class KetQua(models.Model):
     )
     hoc_sinh = models.ForeignKey(HocSinh, on_delete=models.CASCADE)
     mon_hoc = models.ForeignKey(MonHoc, on_delete=models.CASCADE)
+    nam_hoc = models.ForeignKey(NamHoc, null=False, on_delete=models.CASCADE)
     hoc_ki = models.CharField(
         max_length=200, null=False, choices=HOC_KI)
     diem_15phut = models.FloatField(null=True, blank=True)
     diem_1tiet = models.FloatField(null=True, blank=True)
-    diem_final = models.FloatField(null=True, blank=True)
+    diem_gk = models.FloatField(null=True, blank=True)
+    diem_ck = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.hoc_sinh.nguoi_dung.username}_{self.hoc_ki}"
 
 
 # Tạo profile người dùng dựa theo vai trò
-@receiver(post_save, sender=NguoiDung)
-def tao_profile(sender, instance, created, **kwargs):
-    if created:
-        if instance.vai_tro == '1':
-            QuanTriVien.objects.create(nguoi_dung=instance)
-        if instance.vai_tro == '2':
-            GiaoVien.objects.create(nguoi_dung=instance)
-        if instance.vai_tro == '3':
-            HocSinh.objects.create(nguoi_dung=instance)
+# @receiver(post_save, sender=NguoiDung)
+# def tao_profile(sender, instance, created, **kwargs):
+#     if created:
+#         if instance.vai_tro == '1':
+#             QuanTriVien.objects.create(nguoi_dung=instance)
+#         if instance.vai_tro == '2':
+#             GiaoVien.objects.create(nguoi_dung=instance)
+#         if instance.vai_tro == '3':
+#             HocSinh.objects.create(nguoi_dung=instance)
 
 
-@receiver(post_save, sender=NguoiDung)
-def luu_profile(sender, instance, **kwargs):
-    if instance.vai_tro == '1':
-        instance.nhanvien.save()
-    if instance.vai_tro == '2':
-        instance.giao_vien.save()
-    if instance.vai_tro == '3':
-        instance.hoc_sinh.save()
+# @receiver(post_save, sender=NguoiDung)
+# def luu_profile(sender, instance, **kwargs):
+#     if instance.vai_tro == '1':
+#         instance.quantrivien.save()
+#     if instance.vai_tro == '2':
+#         instance.giaovien.save()
+#     if instance.vai_tro == '3':
+#         instance.hocsinh.save()

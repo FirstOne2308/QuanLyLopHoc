@@ -67,3 +67,24 @@ tapSubject.addEventListener("click", () => {
 })
 
 
+// Lấy các phần tử modal và các nút điều khiển
+const modal = document.getElementById('add-student-modal');
+const addStudentBtn = document.getElementById('add-student-btn');
+const closeModalBtn = document.getElementById('close-modal-btn');
+
+// Khi người dùng nhấn nút "Thêm học sinh mới"
+addStudentBtn.onclick = function() {
+  modal.style.display = 'block'; // Hiển thị modal
+}
+
+// Khi người dùng nhấn vào nút đóng (×)
+closeModalBtn.onclick = function() {
+  modal.style.display = 'none'; // Ẩn modal
+}
+
+// Khi người dùng nhấn vào bất kỳ đâu ngoài modal, đóng modal
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = 'none';
+  }
+}

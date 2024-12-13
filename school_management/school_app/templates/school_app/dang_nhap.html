@@ -89,7 +89,7 @@
                 <h2 class="text-center mb-4">Welcome Back!</h2>
                 <p class="text-center mb-4">Sign in to manage your students efficiently.</p>
 
-                <form method="POST" action="#">
+                <form method="POST" action="{% url 'xu-ly-dang-nhap' %}">
                     {% csrf_token %}
                     <!-- Username input -->
                     <div class="mb-3">

@@ -1,0 +1,56 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Cập nhật thông tin giáo viên</h2>
+    
+    <!-- Hiển thị thông báo nếu có -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <label for="id_username">Tên đăng nhập:</label>
+            {{ form.username }}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="id_ho_ten">Họ và tên:</label>
+            {{ form.ho_ten }}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="id_ngay_sinh">Ngày sinh:</label>
+            {{ form.ngay_sinh }}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="id_gioi_tinh">Giới tính:</label>
+            {{ form.gioi_tinh }}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="id_email">Email:</label>
+            {{ form.email }}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="id_dia_chi">Địa chỉ:</label>
+            {{ form.dia_chi }}
+        </div>
+
+
+        <!-- Nút hành động -->
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        <a href="{% url 'ds-giao-vien' %}" class="btn btn-secondary">Hủy</a>
+    </form>
+</div>
+{% endblock %}

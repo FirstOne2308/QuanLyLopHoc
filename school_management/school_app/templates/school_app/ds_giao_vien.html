@@ -1,0 +1,60 @@
+{% extends 'school_app/base.html' %}
+{% block content %}
+<h2>Danh sách giáo viên</h2>
+
+<table class="student-list">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Họ và tên</th>
+            <th>Giới tính</th>
+            <th>Ngày sinh</th>
+            <th>Email</th>
+            <th>Địa chỉ</th>
+            <th>Chuyên môn</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for giao_vien in giao_vien_list %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ giao_vien.nguoi_dung.ho_ten }}</td>
+            <td>{{ giao_vien.nguoi_dung.ngay_sinh|date:"d/m/Y" }}</td>
+            {% if giao_vien.nguoi_dung.gioi_tinh == "1" %}
+            <td>Nam</td>
+            {% else %}
+            <td>Nữ</td>
+            {% endif %}
+            <td>{{ giao_vien.nguoi_dung.email }}</td>
+            <td>{{ giao_vien.nguoi_dung.dia_chi }}</td>
+            <td>{{ giao_vien.mon_day.ten_mon }}</td>
+            <td>
+                <form action="{%url 'cap-nhat-gv' giao_vien.id%}" method="GET" style="display: inline;">
+                    <button type="submit" class="btn btn-warning">Sửa</button>
+                </form>
+                
+                <form action="{% url 'xoa-gv' giao_vien.id%}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa giáo viên này?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-delete">Xóa</button>
+                </form> 
+                
+                <form action="#" method="get" style="display: inline;">
+                    <button type="submit" class="btn btn-primary">Phân công lớp</button>
+                </form>
+            </td>
+            
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8">Không có giáo viên nào.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<form action="{% url 'them-giao-vien' %}" method="get" style="display: inline;">
+    <button type="submit" class="btn btn-add">Thêm giáo viên</button>
+</form>
+
+{% endblock %}

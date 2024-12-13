@@ -1,0 +1,28 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+  <h3>Thêm lớp học mới</h3>
+  <form method="POST" class="form-them-lop">
+    {% csrf_token %}
+    
+    <!-- Tên lớp -->
+    <div class="form-group">
+      <label for="id_ma_lop">Tên lớp:</label>
+      {{ form.ma_lop }}
+    </div>
+    
+    <!-- Năm học -->
+    <div class="form-group">
+      <label for="id_nam_hoc">Năm học:</label>
+      {{ form.nam_hoc }}
+    </div>
+     
+    <!-- Nút submit -->
+    <button type="submit" class="btn-submit">Thêm lớp học</button>
+  </form>
+
+  <!-- Nút thoát: Quay lại trang danh sách lớp học -->
+  <a href="{% url 'lop-hoc' %}">
+    <button type="button" class="btn-cancel">Thoát</button>
+  </a>
+{% endblock %}

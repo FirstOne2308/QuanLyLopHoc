@@ -1,0 +1,80 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+  <div class="lop-hoc-container">
+    <h2>Danh sách lớp học</h2>
+
+    <!-- Nút thêm lớp học mới -->
+    <a href="{% url 'them-lop-hoc' %}">
+      <button class="btn-add">Thêm lớp học mới</button>
+    </a>
+
+    <!-- Nút tạo danh sách lớp -->
+    <a href="{% url 'tao-ds-lop' %}">
+      <button class="btn-add">Tạo danh sách lớp</button>
+    </a>
+
+    <!-- Form lọc -->
+    <form method="GET" class="filter-form" id="filter-form">
+      <label for="nam_hoc">Năm học:</label>
+      <select name="nam_hoc" id="nam_hoc" onchange="this.form.submit()">
+        <option value="">-- Chọn năm học --</option>
+        {% for nam_hoc in nam_hoc_options %}
+          <option value="{{ nam_hoc.nam }}" {% if nam_hoc.nam == current_nam_hoc %}selected{% endif %}>{{ nam_hoc.nam }}</option>
+        {% endfor %}
+      </select>
+
+      <!-- <label for="ten_lop">Tên lớp:</label>
+      <select name="ten_lop" id="ten_lop" onchange="this.form.submit()">
+        <option value="">-- Chọn tên lớp --</option>
+        {% for ten_lop in ten_lop_options %}
+          <option value="{{ ten_lop }}" {% if ten_lop == current_ten_lop %}selected{% endif %}>{{ ten_lop }}</option>
+        {% endfor %}
+      </select> -->
+    </form>
+
+    <!-- Hiển thị thông báo thành công -->
+    <!-- {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="alert alert-success">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %} -->
+
+    <!-- Danh sách lớp học -->
+    <table class="lop-hoc-table">
+        <thead>
+          <tr>
+            <th>Tên lớp</th>
+            <th>Năm học</th>
+            <th>Số lượng học sinh</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lop_hoc in lop_hoc_list %}
+            <tr>
+              <td>{{ lop_hoc.ma_lop }}</td>
+              <td>{{ lop_hoc.nam_hoc }}</td>
+              <td>{{ lop_hoc.so_hs }}</td>
+              <td>
+                <a href="{% url 'danh-sach-lop' lop_hoc.id %}">Xem danh sách</a> |
+                <form action="{% url 'xoa-lop-hoc' lop_hoc.id %}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lớp này?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-delete">Xóa</button>
+                </form> </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4">Không có lớp học nào</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+    </table>
+  </div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+  <h2>Danh sách điểm</h2>
+
+  <!-- Form lọc -->
+  <form method="GET" action="{% url 'diem' %}" class="filter-form">
+    <div class="filter-item">
+      <label for="nam_hoc">Năm học:</label>
+      <select name="nam_hoc" id="nam_hoc" onchange="this.form.submit()">
+        <option value="">Chọn năm học</option>
+        {% for nam_hoc in nam_hoc_list %}
+          <option value="{{ nam_hoc.nam }}" {% if nam_hoc.nam == selected_nam_hoc %}selected{% endif %}>{{ nam_hoc.nam }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="filter-item">
+      <label for="lop_hoc">Lớp học:</label>
+      <select name="lop_hoc" id="lop_hoc" onchange="this.form.submit()">
+        <option value="">Chọn lớp học</option>
+        {% for lop_hoc in lop_hoc_list %}
+          <option value="{{ lop_hoc.ma_lop }}" {% if lop_hoc.ma_lop == selected_lop_hoc %}selected{% endif %}>{{ lop_hoc.ma_lop }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="filter-item">
+      <label for="mon_hoc">Môn học:</label>
+      <select name="mon_hoc" id="mon_hoc" onchange="this.form.submit()">
+        <option value="">Chọn môn học</option>
+        {% for mon_hoc in mon_hoc_list %}
+          <option value="{{ mon_hoc.ten_mon }}" {% if mon_hoc.ten_mon == selected_mon_hoc %}selected{% endif %}>{{ mon_hoc.ten_mon }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="filter-item">
+      <label for="hoc_ki">Học kỳ:</label>
+      <select name="hoc_ki" id="hoc_ki" onchange="this.form.submit()">
+        <option value="">Chọn học kỳ</option>
+        <option value="1" {% if selected_hoc_ki == '1' %}selected{% endif %}>Học kỳ 1</option>
+        <option value="2" {% if selected_hoc_ki == '2' %}selected{% endif %}>Học kỳ 2</option>
+      </select>
+    </div>
+    
+    <button type="submit" class="filter-btn">Lọc</button>
+  </form>
+
+  <!-- Bảng điểm -->
+  <div class="score-table-container">
+    <table class="student-list">
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Học sinh</th>
+          <th>Môn học</th>
+          <th>Học kỳ</th>
+          <th>Điểm 15 phút</th>
+          <th>Điểm 1 tiết</th>
+          <th>Điểm giữa kỳ</th>
+          <th>Điểm cuối kỳ</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ket_qua in ket_qua_list %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ ket_qua.hoc_sinh.nguoi_dung.ho_ten }}</td>  <!-- Hiển thị tên học sinh -->
+            <td>{{ ket_qua.mon_hoc.ten_mon }}</td>
+            <td>{{ ket_qua.hoc_ki }}</td>
+            <td>{{ ket_qua.diem_15phut|default:0 }}</td>
+            <td>{{ ket_qua.diem_1tiet|default:0 }}</td>
+            <td>{{ ket_qua.diem_gk|default:0 }}</td>
+            <td>{{ ket_qua.diem_ck|default:0 }}</td>
+            <td>
+                <!-- Nút chỉnh sửa -->
+                <a href="{%url 'cap-nhat-diem' ket_qua.id%}" class="btn-delete">Chỉnh sửa</a>
+              </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8">Không có kết quả nào</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

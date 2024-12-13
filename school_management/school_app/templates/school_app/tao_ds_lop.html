@@ -1,0 +1,102 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+  <div class="tao-danh-sach-lop-container">
+    <h2>Tạo danh sách lớp</h2>
+
+    <!-- Form lọc năm học và lớp -->
+    <form method="GET" id="filter-form" class="filter-form">
+        <label for="nam_hoc">Năm học:</label>
+        <select name="nam_hoc" id="nam_hoc" onchange="filterChange()">
+          <option value="">-- Chọn năm học --</option>
+          {% for nam_hoc in nam_hoc_options %}
+            <option value="{{ nam_hoc.nam }}" {% if nam_hoc.nam == selected_nam_hoc %}selected{% endif %}>{{ nam_hoc.nam }}</option>
+          {% endfor %}
+        </select>
+      
+        <label for="ten_lop">Tên lớp:</label>
+        <select name="ten_lop" id="ten_lop" onchange="filterChange()">
+          <option value="">-- Chọn lớp --</option>
+          {% for ten_lop in ten_lop_options %}
+            <option value="{{ ten_lop.ma_lop }}" {% if ten_lop.ma_lop == selected_ten_lop %}selected{% endif %}>{{ ten_lop.ma_lop }}</option>
+          {% endfor %}
+        </select>
+    </form>
+
+    <!-- Danh sách học sinh chưa có lớp -->
+    <h3>Danh sách học sinh chưa có lớp</h3>
+    <form method="POST" action="" onsubmit="return validateForm()">
+      {% csrf_token %}
+      <table class="student-list">
+        <thead>
+          <tr>
+            <th>Chọn</th>
+            <th>STT</th>
+            <th>Họ và tên</th>
+            <th>Ngày sinh</th>
+            <th>Giới tính</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for hocsinh in hoc_sinh_chua_co_lop %}
+            <tr>
+              <td>
+                <input type="checkbox" name="hoc_sinh_ids" value="{{ hocsinh.id }}">
+              </td>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ hocsinh.nguoi_dung.ho_ten }}</td>
+              <td>{{ hocsinh.nguoi_dung.ngay_sinh|date:"d/m/Y" }}</td>
+              {% if hocsinh.nguoi_dung.gioi_tinh == "1" %}
+              <td>Nam</td>
+              {% else %}
+              <td>Nữ</td>
+              {% endif %}
+              <td>{{ hocsinh.nguoi_dung.email }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6">Không có học sinh nào chưa có lớp</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- Nút lưu danh sách -->
+      <button type="submit" class="btn-save">Lưu danh sách</button>
+    </form>
+
+    <!-- Nút Thoát -->
+    <a href="{% url 'lop-hoc' %}" class="btn-cancel">Thoát</a>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Hàm gửi form tự động khi thay đổi trường lọc
+    function filterChange() {
+      const form = document.getElementById('filter-form');
+      form.submit();
+    }
+
+    // Hàm kiểm tra khi nhấn nút Lưu danh sách
+    function validateForm() {
+      const namHoc = document.getElementById('nam_hoc').value;
+      const tenLop = document.getElementById('ten_lop').value;
+
+      // Kiểm tra nếu chưa chọn năm học hoặc lớp học
+      if (!namHoc || !tenLop) {
+        alert('Vui lòng chọn đầy đủ năm học và lớp học!');
+        return false; // Ngừng gửi form
+      }
+
+      // Kiểm tra nếu không chọn học sinh nào
+      const selectedStudents = document.querySelectorAll('input[name="hoc_sinh_ids"]:checked');
+      if (selectedStudents.length === 0) {
+        alert('Vui lòng chọn học sinh để thêm vào lớp!');
+        return false; // Ngừng gửi form
+      }
+
+      return true; // Gửi form nếu không có lỗi
+    }
+  </script>
+{% endblock %}

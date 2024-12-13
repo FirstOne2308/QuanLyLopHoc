@@ -959,3 +959,538 @@ border-radius: 3px;
 .cus_subject .add:hover {
 background-color: rgba(144, 238, 144, 0.499);
 }
+
+
+/* Style cho bảng danh sách học sinh */
+.student-list {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.student-list th, .student-list td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.student-list th {
+  background-color: #f4f4f4;
+}
+
+/* Style cho nút thêm học sinh */
+.btn-add-student {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.btn-add-student:hover {
+  background-color: #45a049;
+}
+
+/* Style cho modal */
+.modal {
+  display: none; /* Ẩn modal mặc định */
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Nền xám */
+  overflow: auto;
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+}
+
+.close-btn {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Style cho các nút trong form */
+input[type="text"],
+input[type="date"] {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+.btn-submit {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background-color: #45a049;
+}
+
+
+.messages {
+  margin-bottom: 20px;
+}
+
+.alert {
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.alert.success {
+  background-color: #dff0d8;
+  color: #3c763d;
+  border: 1px solid #d6e9c6;
+}
+
+.alert.error {
+  background-color: #f2dede;
+  color: #a94442;
+  border: 1px solid #ebccd1;
+}
+
+.alert.info {
+  background-color: #d9edf7;
+  color: #31708f;
+  border: 1px solid #bce8f1;
+}
+
+
+/* Container tổng */
+.them-hoc-sinh-container {
+  width: 50%;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+}
+
+.them-hoc-sinh-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+/* Thông báo */
+.messages {
+  margin-bottom: 20px;
+}
+
+.alert {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.alert.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Form */
+form {
+  width: 100%;
+}
+
+.input_field {
+  margin-bottom: 20px;
+}
+
+.input_field label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.input_field input,
+.input_field select,
+.input_field textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.input_field input:focus,
+.input_field select:focus,
+.input_field textarea:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Nút Lưu và Thoát */
+.btn-submit {
+  display: inline-block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: #0056b3;
+}
+
+.btn-cancel {
+  display: inline-block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #6c757d;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+/* Đáp ứng trên thiết bị di động */
+@media (max-width: 768px) {
+  .them-hoc-sinh-container {
+      width: 90%;
+      padding: 15px;
+  }
+
+  .btn-submit, .btn-cancel {
+      font-size: 14px;
+      padding: 8px;
+  }
+}
+
+
+.btn-cancel {
+  background-color: #6d6a6a; /* Màu đỏ */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.btn-cancel:hover {
+  background-color: #6d6a6a; /* Màu đỏ đậm khi hover */
+}
+
+
+.btn-add {
+  display: inline-block;
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.btn-add:hover {
+  background-color: #45a049;
+}
+
+/* Form lọc */
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.filter-form label {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.filter-form select,
+.filter-form input {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+  width: 48%; /* Tạo không gian thoáng cho các trường nhập */
+}
+
+.filter-form select {
+  width: 48%; /* Điều chỉnh cho các trường select */
+}
+
+.filter-form button {
+  padding: 10px 20px;
+  background-color: #2196F3;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%; /* Nút lọc sẽ chiếm toàn bộ chiều rộng */
+  margin-top: 10px;
+}
+
+.filter-form button:hover {
+  background-color: #0b7dda;
+}
+
+/* Thông báo */
+.messages .alert {
+  padding: 10px;
+  background-color: #d4edda;
+  color: #155724;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.messages .alert.alert-success {
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+/* Bảng danh sách lớp học */
+.lop-hoc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+}
+
+.lop-hoc-table th,
+.lop-hoc-table td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.lop-hoc-table th {
+  background-color: #f1f1f1;
+  font-size: 16px;
+}
+
+.lop-hoc-table td {
+  font-size: 14px;
+}
+
+.lop-hoc-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.lop-hoc-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.lop-hoc-table td[colspan="3"] {
+  text-align: center;
+  font-style: italic;
+  color: #999;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .filter-form label {
+    width: 100%;
+  }
+
+  .filter-form select,
+  .filter-form input {
+    width: 100%;
+  }
+
+  .lop-hoc-table th,
+  .lop-hoc-table td {
+    padding: 8px;
+  }
+
+  .lop-hoc-table {
+    font-size: 14px;
+  }
+}
+
+
+
+/* Container chính */
+.tao-danh-sach-lop-container {
+  margin: 20px auto;
+  max-width: 900px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.tao-danh-sach-lop-container h2 {
+  text-align: center;
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.tao-danh-sach-lop-container h3 {
+  font-size: 20px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+/* Form lọc */
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  justify-content: space-between;
+}
+
+.filter-form label {
+  font-weight: bold;
+  color: #444;
+}
+
+.filter-form select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 200px;
+}
+
+.filter-form button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filter-form button:hover {
+  background-color: #45a049;
+}
+
+/* Bảng danh sách sinh viên */
+.sinh-vien-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.sinh-vien-table th,
+.sinh-vien-table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.sinh-vien-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  color: #333;
+}
+
+.sinh-vien-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.sinh-vien-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.sinh-vien-table td input[type="checkbox"] {
+  cursor: pointer;
+}
+
+/* Nút lưu */
+.btn-save {
+  background-color: #007BFF;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+}
+
+.btn-save:hover {
+  background-color: #0056b3;
+}
+
+/* Phản hồi giao diện trên thiết bị nhỏ */
+@media (max-width: 768px) {
+  .filter-form {
+    flex-direction: column;
+  }
+
+  .filter-form select,
+  .filter-form button {
+    width: 100%;
+  }
+
+  .sinh-vien-table {
+    font-size: 14px;
+  }
+}
+
+.btn-save.disabled {
+  background-color: #ccc;  /* Màu xám */
+  cursor: not-allowed;     /* Đổi con trỏ thành không thể nhấn */
+}
+
+

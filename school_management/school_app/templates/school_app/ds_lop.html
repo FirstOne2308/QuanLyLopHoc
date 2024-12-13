@@ -1,0 +1,48 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+<h2>Danh sách học sinh - Lớp {{ lop_hoc.ma_lop }}</h2>
+<table class="student-list">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Họ và tên</th>
+            <th>Ngày sinh</th>
+            <th>Giới tính</th>
+            <th>Email</th>
+            <th>Địa chỉ</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for hocsinh in ds_hoc_sinh %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ hocsinh.nguoi_dung.ho_ten }}</td>
+            <td>{{ hocsinh.nguoi_dung.ngay_sinh|date:"d/m/Y" }}</td>
+            {% if hocsinh.nguoi_dung.gioi_tinh == "1" %}
+            <td>Nam</td>
+            {% else %}
+            <td>Nữ</td>
+            {% endif %}
+            <td>{{ hocsinh.nguoi_dung.email }}</td>
+            <td>{{ hocsinh.nguoi_dung.dia_chi }}</td>
+            <td>
+                <form action="{%url 'xoa-hs-khoi-lop' lop_hoc.id hocsinh.id%}" method="POST"
+                    onsubmit="return confirm('Bạn có chắc muốn xóa học sinh này khỏi lớp?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-delete">Xóa</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Không có học sinh nào trong lớp này</td>
+        </tr>
+        {% endfor %}
+        <a href="{% url 'lop-hoc' %}?nam_hoc={{ lop_hoc.nam_hoc }}">
+            <button class="btn-back">Trở về</button>
+        </a>
+    </tbody>
+</table>
+{% endblock %}
