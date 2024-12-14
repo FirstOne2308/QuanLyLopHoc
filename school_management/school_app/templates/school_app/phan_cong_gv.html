@@ -1,0 +1,104 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Phân công giáo viên dạy</h2>
+
+    <!-- Hiển thị thông báo nếu có -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Form phân công giáo viên -->
+    <form method="POST" id="phanCongForm">
+        {% csrf_token %}
+
+        <!-- Năm học -->
+        <div class="form-group mb-3">
+            <label for="id_nam_hoc">Năm học:</label>
+            <select class="form-select" name="nam_hoc" id="id_nam_hoc" required onchange="filterLopHoc()">
+                <option value="" disabled {% if not current_nam_hoc %}selected{% endif %}>Chọn năm học</option>
+                {% for nam_hoc in nam_hoc_list %}
+                    <option value="{{ nam_hoc.nam }}" {% if nam_hoc.nam == current_nam_hoc %}selected{% endif %}>
+                        {{ nam_hoc.nam }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Lớp học -->
+        <div class="form-group mb-3">
+            <label for="id_lop_hoc">Lớp học:</label>
+            {% if lop_hoc_list %}
+                <table class="student-list">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên lớp</th>
+                            <th>Chọn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lop_hoc in lop_hoc_list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ lop_hoc.ma_lop }}</td>
+                                <td>
+                                    <input type="checkbox" class="form-check-input" name="lop_hoc" value="{{ lop_hoc.id }}">
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Không có lớp học cho năm học này.</p>
+            {% endif %}
+        </div>
+
+        <!-- Nút hành động -->
+        <button type="submit" class="btn btn-save" id="saveBtn">Lưu</button>
+        <a href="{% url 'ds-giao-vien' %}" class="btn btn-cancel">Hủy</a>
+    </form>
+</div>
+
+<script>
+    document.getElementById('saveBtn').addEventListener('click', function(event) {
+        const namHocSelect = document.getElementById('id_nam_hoc');
+        const lopHocCheckboxes = document.getElementsByName('lop_hoc');
+        let selectedNamHoc = namHocSelect.value;
+        let selectedLopHoc = false;
+
+        // Kiểm tra xem có lớp học nào được chọn không
+        for (let checkbox of lopHocCheckboxes) {
+            if (checkbox.checked) {
+                selectedLopHoc = true;
+                break;
+            }
+        }
+
+        // Nếu chưa chọn năm học hoặc lớp học, hiển thị thông báo
+        if (!selectedNamHoc || !selectedLopHoc) {
+            event.preventDefault();  // Ngừng form gửi
+            alert('Vui lòng chọn đầy đủ năm học và lớp học trước khi lưu.');
+        }
+    });
+
+    // Hàm để lọc lớp học theo năm học
+    function filterLopHoc() {
+        const namHocSelect = document.getElementById('id_nam_hoc');
+        const selectedNamHoc = namHocSelect.value;
+        const url = new URL(window.location.href);
+
+        if (selectedNamHoc) {
+            url.searchParams.set('nam_hoc', selectedNamHoc);
+            window.location.href = url.toString();
+        }
+    }
+</script>
+{% endblock %}

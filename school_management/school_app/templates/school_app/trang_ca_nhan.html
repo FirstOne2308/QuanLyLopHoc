@@ -1,0 +1,49 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin cá nhân</title>
+</head>
+<body>
+    <h2>Thông tin cá nhân</h2>
+
+    <table border="1">
+        <tr>
+            <th>Họ và tên</th>
+            <td>{{ user.ho_ten }}</td>
+        </tr>
+        <tr>
+            <th>Ngày sinh</th>
+            <td>{{ user.ngay_sinh |date:"d/m/Y"}}</td>
+        </tr>
+        <tr>
+            <th>Giới tính</th>
+            <td>
+                {% if user.gioi_tinh == '1' %}
+                    Nam
+                {% elif user.gioi_tinh == '0' %}
+                    Nữ
+                {% else %}
+                    Không xác định
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{ user.email }}</td>
+        </tr>
+        <tr>
+            <th>Địa chỉ</th>
+            <td>{{ user.dia_chi }}</td>
+        </tr>
+    </table>
+
+    <br>
+    <a href="{% url 'ket-qua-hoc-tap' %}">Trở về trang chủ</a>
+</body>
+</html>
+{% endblock content %}

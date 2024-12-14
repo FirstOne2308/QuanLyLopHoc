@@ -25,4 +25,11 @@ urlpatterns = [
     path('ds-giao-vien/them-giao-vien', views.them_giao_vien, name='them-giao-vien'),
     path('ds-giao-vien/cap-nhat-gv/<int:giao_vien_id>', views.cap_nhat_giao_vien, name='cap-nhat-gv'),
     path('ds-giao-vien/xoa-gv/<int:giao_vien_id>', views.xoa_giao_vien, name='xoa-gv'),
+    path('ds-giao-vien/phan-cong-gv/<int:giao_vien_id>', views.phan_cong_giao_vien, name='phan-cong-gv'),
+    path('tong-ket/', views.tong_ket, name='tong-ket'),
+    path('ket-qua-hoc-tap', views.ket_qua_hoc_tap, name='ket-qua-hoc-tap'),
+    path('trang-ca-nhan', views.trang_ca_nhan, name='trang-ca-nhan'),
+    path('xuat-diem', views.xuat_diem, name='xuat-diem'),
+    path('quan-ly-diem', views.quan_ly_diem, name='quan-ly-diem'),
+    path('quan-ly-diem/cap-nhat-diem/<int:diem_id>', views.cap_nhat_diem_gv, name='cap-nhat-diem-gv'),
 ]

@@ -23,6 +23,7 @@ class NguoiDungForm(forms.ModelForm):
 
     password = forms.CharField(
         label="",
+        required=False,
         widget=forms.TextInput(attrs={
             'id': "password",
             'class': "form-control",

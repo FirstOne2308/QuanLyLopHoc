@@ -1,0 +1,106 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng Kết Điểm Trung Bình</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tổng Kết Điểm Trung Bình Các Lớp</h1>
+        <form method="GET">
+            <label for="namHoc">Chọn Năm Học:</label>
+            <select id="namHoc" name="nam_hoc_id" onchange="this.form.submit()">
+                <option value="">-- Chọn Năm Học --</option>
+                {% for nam in nam_hocs %}
+                <option value="{{ nam.id }}" {% if nam.id == selected_nam_hoc %}selected{% endif %}>
+                    {{ nam.nam }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <label for="monHoc">Chọn Môn Học:</label>
+            <select id="monHoc" name="mon_hoc_id" onchange="this.form.submit()">
+                <option value="">-- Chọn Môn Học --</option>
+                {% for mon in mon_hocs %}
+                <option value="{{ mon.id }}" {% if mon.id == selected_mon_hoc %}selected{% endif %}>
+                    {{ mon.ten_mon }}
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+
+        {% if lop_data %}
+        <canvas id="classComparisonChart" width="800" height="400"></canvas>
+
+        <script>
+            // Lấy dữ liệu từ Django context
+            const labels = {{ labels|safe }}; // Tên các lớp học
+            const dataPoints = {{ data_points|safe }}; // Điểm trung bình của từng lớp
+
+            const ctx = document.getElementById('classComparisonChart').getContext('2d');
+            const classComparisonChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Điểm Trung Bình',
+                        data: dataPoints,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Điểm Trung Bình'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Lớp'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'So Sánh Điểm Trung Bình Các Lớp'
+                        }
+                    }
+                }
+            });
+        </script>
+        {% else %}
+        <p>Không có dữ liệu.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
+{% endblock content %}

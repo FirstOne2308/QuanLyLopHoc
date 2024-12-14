@@ -43,7 +43,12 @@
         <option value="2" {% if selected_hoc_ki == '2' %}selected{% endif %}>Học kỳ 2</option>
       </select>
     </div>
-    
+
+    <div class="filter-item">
+      <label for="search_name">Tìm kiếm theo tên học sinh:</label>
+      <input type="text" name="search_name" id="search_name" value="{{ search_name }}" placeholder="Nhập tên học sinh" onchange="this.form.submit()">
+    </div>
+
     <button type="submit" class="filter-btn">Lọc</button>
   </form>
 
@@ -60,6 +65,7 @@
           <th>Điểm 1 tiết</th>
           <th>Điểm giữa kỳ</th>
           <th>Điểm cuối kỳ</th>
+          <th>Điểm tổng</th>
           <th>Hành động</th>
         </tr>
       </thead>
@@ -74,18 +80,27 @@
             <td>{{ ket_qua.diem_1tiet|default:0 }}</td>
             <td>{{ ket_qua.diem_gk|default:0 }}</td>
             <td>{{ ket_qua.diem_ck|default:0 }}</td>
+            <td>{{ ket_qua.diem_tong|default:0 }}</td>
             <td>
                 <!-- Nút chỉnh sửa -->
-                <a href="{%url 'cap-nhat-diem' ket_qua.id%}" class="btn-delete">Chỉnh sửa</a>
-              </td>
+                <a href="{% url 'cap-nhat-diem' ket_qua.id %}" class="btn-delete">Chỉnh sửa</a>
+            </td>
           </tr>
         {% empty %}
           <tr>
-            <td colspan="8">Không có kết quả nào</td>
+            <td colspan="9">Không có kết quả nào</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
+  <!-- Nút xuất điểm khi tất cả các trường được chọn -->
+  {% if selected_nam_hoc and selected_lop_hoc and selected_mon_hoc and selected_hoc_ki %}
+    <a href="{% url 'xuat-diem' %}?nam_hoc={{ selected_nam_hoc }}&lop_hoc={{ selected_lop_hoc }}&mon_hoc={{ selected_mon_hoc }}&hoc_ki={{ selected_hoc_ki }}"
+       class="btn btn-add">
+      Xuất điểm
+    </a>
+  {% endif %}
 
 {% endblock %}

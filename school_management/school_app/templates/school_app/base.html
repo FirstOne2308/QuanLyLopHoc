@@ -52,7 +52,7 @@
           </a>
         </div>
         <div class="dropdown-menu">
-          <a href="#" class="dropdown-link">
+          <a href="{%url 'trang-ca-nhan'%}" class="dropdown-link">
             <img width="20" height="20" viewBox="0 0 32 32" src="{% static 'images/edit.png' %}">
             &nbspThông tin cá nhân
           </a>
@@ -104,36 +104,12 @@
         <img src="{% static 'images/report.png' %}">
         Điểm
     </a>
-    <a href="#" class="sidebar-link">
+    <a href="{%url 'tong-ket'%}" class="sidebar-link">
         <img src="{% static 'images/search.png' %}">
-        Báo cáo tổng kết
-    </a>
-    <a href="#" class="sidebar-link">
-        <img src="{% static 'images/settings.png' %}">
-        Cài đặt
+        Tổng kết
     </a>
 {% elif user.vai_tro == '3' %}
-    <!-- Hiển thị các mục phù hợp với vai_tro = 1 -->
-    <a href="#" class="sidebar-link">
-        <img src="{% static 'images/home.png' %}">
-        Trang chủ
-    </a>
-    <a href="#" class="sidebar-link">
-        <img src="{% static 'images/student.png' %}">
-        Học sinh
-    </a>
-    <a href="#" class="sidebar-link">
-        <img src="{% static 'images/class.png' %}">
-        Lớp học
-    </a>
-    <a href="{%url 'mon-hoc'%}" class="sidebar-link">
-        <img src="{% static 'images/book.png' %}">
-        Môn học
-    </a>
-    <a href="#" class="sidebar-link">
-        <img src="{% static 'images/settings.png' %}">
-        Cài đặt
-    </a>
+    <!-- Hiển thị các mục phù hợp với vai_tro = 1 --> 
 {% else %}
     <!-- Trường hợp không xác định -->
     <a href="#" class="sidebar-link">
