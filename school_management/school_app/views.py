@@ -334,7 +334,7 @@ def them_mon_hoc(request):
         form = MonHocForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Thêm môn học thành công!")
+            messages.success(request, "Thêm môn học thành công!", extra_tags='add_subj')
             return redirect('mon-hoc')  
     else:
         form = MonHocForm()
@@ -709,68 +709,75 @@ def tong_ket(request):
 
     return render(request, 'school_app/tong_ket.html', context)
 
+
 @login_required(login_url='dang-nhap')
 def ket_qua_hoc_tap(request):
-    # Lấy thông tin giáo viên đang đăng nhập
-    giao_vien = GiaoVien.objects.get(nguoi_dung=request.user)
+    # Lấy học sinh hiện tại
+    try:
+        hoc_sinh = HocSinh.objects.get(nguoi_dung=request.user)
+    except HocSinh.DoesNotExist:
+        return render(request, 'school_app/404.html', {'message': 'Học sinh không tồn tại'})
 
-    # Lấy các tham số từ request
-    selected_nam_hoc = request.GET.get('nam_hoc')  # Lọc theo năm học (nếu có)
-    selected_hoc_ki = request.GET.get('hoc_ki')    # Lọc theo học kỳ (nếu có)
+    # Lấy năm học và học kỳ đã chọn từ GET
+    selected_nam_hoc = request.GET.get('nam_hoc', None)
+    selected_hoc_ki = request.GET.get('hoc_ki', None)
 
-    # Lọc các lớp học mà giáo viên được phân công trong năm học đã chọn
     if selected_nam_hoc:
-        nam_hoc = NamHoc.objects.get(nam=selected_nam_hoc)
-        lop_hoc_list = LopHoc.objects.filter(giao_vien=giao_vien, nam_hoc=nam_hoc)
+        try:
+            nam_hoc = NamHoc.objects.get(nam=selected_nam_hoc)
+        except NamHoc.DoesNotExist:
+            nam_hoc = None
     else:
-        # Nếu không chọn năm học, lấy năm học gần nhất
-        nam_hoc = NamHoc.objects.last()
-        lop_hoc_list = LopHoc.objects.filter(giao_vien=giao_vien, nam_hoc=nam_hoc) if nam_hoc else None
+        nam_hoc = None
 
-    # Nếu không có lớp nào phù hợp, trả về danh sách rỗng
-    if not lop_hoc_list.exists():
-        lop_hoc_list = None
-        ket_qua_hoc_ky = None
-        ket_qua_mon_hoc = None
-        ket_qua_nam_hoc = None
-    else:
-        # Lọc kết quả học tập theo lớp học
-        hoc_sinh_list = HocSinh.objects.filter(lop_hoc__in=lop_hoc_list)
+    # Lấy lớp học của học sinh trong năm học đã chọn
+    lop_hoc = None
+    if nam_hoc:
+        lop_hoc = hoc_sinh.lop_hoc.filter(nam_hoc=nam_hoc).first()  # Lấy lớp học đầu tiên trong năm học này
 
-        if selected_hoc_ki:
-            # Lọc kết quả theo học kỳ
+    # Lấy kết quả học tập
+    ket_qua_hoc_ky = None
+    ket_qua_mon_hoc = None
+    ket_qua_nam_hoc = None
+
+    if nam_hoc:
+        if selected_hoc_ki:  # Nếu người dùng chọn học kỳ
+            # Kết quả học kỳ (Học kỳ 1 hoặc Học kỳ 2)
             ket_qua_hoc_ky = KetQua.objects.filter(
-                hoc_sinh__in=hoc_sinh_list,
+                hoc_sinh=hoc_sinh,
                 nam_hoc=nam_hoc,
                 hoc_ki=selected_hoc_ki
             )
-            ket_qua_mon_hoc = None  # Không hiển thị kết quả cả năm nếu chọn học kỳ
-            ket_qua_nam_hoc = None
         else:
-            # Hiển thị kết quả cả năm
-            ket_qua_hoc_ky = None
+            # Kết quả môn học cả năm
             ket_qua_mon_hoc = KetQuaMonHoc.objects.filter(
-                hoc_sinh__in=hoc_sinh_list,
+                hoc_sinh=hoc_sinh,
                 nam_hoc=nam_hoc
             )
-            ket_qua_nam_hoc = KetQuaNamHoc.objects.filter(
-                hoc_sinh__in=hoc_sinh_list,
-                nam_hoc=nam_hoc
-            ).first()
 
-    # Lấy danh sách năm học để người dùng chọn
-    danh_sach_nam_hoc = NamHoc.objects.values_list('nam', flat=True).distinct()
+            # Kết quả tổng kết năm học
+            try:
+                ket_qua_nam_hoc = KetQuaNamHoc.objects.get(
+                    hoc_sinh=hoc_sinh,
+                    nam_hoc=nam_hoc
+                )
+            except KetQuaNamHoc.DoesNotExist:
+                ket_qua_nam_hoc = None
 
+    # Danh sách tất cả các năm học
+    danh_sach_nam_hoc = hoc_sinh.lop_hoc.values_list('nam_hoc__nam', flat=True).distinct()
+
+    # Tạo context để gửi dữ liệu sang template
     context = {
-        'giao_vien': giao_vien,
-        'lop_hoc_list': lop_hoc_list,
-        'ket_qua_hoc_ky': ket_qua_hoc_ky,
-        'ket_qua_mon_hoc': ket_qua_mon_hoc,
-        'ket_qua_nam_hoc': ket_qua_nam_hoc,
-        'danh_sach_nam_hoc': danh_sach_nam_hoc,
-        'selected_nam_hoc': selected_nam_hoc,
-        'selected_hoc_ki': selected_hoc_ki,
+        'lop_hoc': lop_hoc, 
+        'danh_sach_nam_hoc': danh_sach_nam_hoc,  
+        'selected_nam_hoc': selected_nam_hoc,  
+        'selected_hoc_ki': selected_hoc_ki,  
+        'ket_qua_hoc_ky': ket_qua_hoc_ky,  
+        'ket_qua_mon_hoc': ket_qua_mon_hoc,  
+        'ket_qua_nam_hoc': ket_qua_nam_hoc,  
     }
+
     return render(request, 'school_app/ket_qua_hoc_tap.html', context)
 
 
@@ -792,7 +799,7 @@ def quan_ly_diem(request):
     selected_lop_hoc = request.GET.get('lop_hoc', None)
 
     # Lấy danh sách lớp học mà giáo viên dạy
-    lop_hoc_list = LopHoc.objects.filter(giaovien=giao_vien)
+    lop_hoc_list = LopHoc.objects.filter(giaovien=giao_vien, nam_hoc__nam = selected_nam_hoc)
 
     # Lấy danh sách năm học
     nam_hoc_list = NamHoc.objects.all()
@@ -811,7 +818,7 @@ def quan_ly_diem(request):
     if selected_lop_hoc:
         ket_qua_list = ket_qua_list.filter(hoc_sinh__lop_hoc__ma_lop=selected_lop_hoc)
 
-    mon_hoc = MonHoc.objects.filter(giaovien=giao_vien).first
+    mon_hoc = MonHoc.objects.filter(giaovien=giao_vien).first()
     context = {
         'nam_hoc_list': nam_hoc_list,
         'lop_hoc_list': lop_hoc_list,
@@ -822,8 +829,7 @@ def quan_ly_diem(request):
         'mon_hoc': mon_hoc
     }
 
-    return render(request, 'school_app/home_giao_vien.html', context)
-
+    return render(request, 'school_app/home_giao_vien.html', context) 
 
 
 @login_required(login_url='dang-nhap')

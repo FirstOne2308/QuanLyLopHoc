@@ -52,8 +52,8 @@
 
         <script>
             // Lấy dữ liệu từ Django context
-            const labels = {{ labels|safe }}; // Tên các lớp học
-            const dataPoints = {{ data_points|safe }}; // Điểm trung bình của từng lớp
+            labels = {{labels|safe}} ; // Tên các lớp học
+            dataPoints = {{data_points|safe}} ; // Điểm trung bình của từng lớp
 
             const ctx = document.getElementById('classComparisonChart').getContext('2d');
             const classComparisonChart = new Chart(ctx, {

@@ -9,6 +9,7 @@
 <form method="GET">
     <label for="nam_hoc">Năm học:</label>
     <select name="nam_hoc" id="nam_hoc">
+        <option value="">Chọn năm học</option>
         {% for nam in danh_sach_nam_hoc %}
         <option value="{{ nam }}" {% if selected_nam_hoc == nam %}selected{% endif %}>{{ nam }}</option>
         {% endfor %}
