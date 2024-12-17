@@ -6,8 +6,10 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <title>Quan Ly Hoc Sinh</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
 
 <body>
@@ -15,25 +17,24 @@
   <header class="header">
     <div class="left-section">
       <div class="navbar__toggle" id="sidebar">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
+        <span>
+          <i class="fa-solid fa-bars"></i>
+          <i class="fa-solid fa-xmark"></i>
+        </span>
       </div>
       <a class="header__logo" href="#">
         <img src="{% static 'images/logo.webp' %}">
-        <h1>Quan Ly Hoc Sinh</h1>
+        <h2>Quản lý học sinh</h2>
       </a>
-    </div>
-    <div class="middle-section">
     </div>
     <div class="right-section">
       <div class="message-icon-container">
-        <img src="{% static 'images/message.png' %}" class="message-icon">
+        <span class="login-input-text bg-white text-muted"><i class="fa-regular fa-envelope"></i></span>
         <div class="tooltip">Tin nhắn</div>
         <!-- <div class="message-count">3</div> -->
       </div>
       <div class="notification-icon-container">
-        <img src="{% static 'images/notification.jpg' %}" class="notification-icon">
+        <span class="login-input-text bg-white text-muted"><i class="fa-regular fa-bell"></i></span>
         <div class="tooltip">Thông báo</div>
         <!-- <div class="notification-count">2</div> -->
       </div>
@@ -41,23 +42,25 @@
         <div class="user-menu">
           <a href="#">
             <div class="avatar">
-              <img src="{% static 'images/user.png' %}">
+              <img src="{% static 'images/profile.png' %}">
             </div>
             <button class="dropdown-button">
-              <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32">
+              {% comment %} <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                viewBox="0 0 32 32">
                 <title>chevron-down</title>
                 <path d="M16 21l-13-13h-3l16 16 16-16h-3l-13 13z"></path>
-              </svg>
+              </svg> {% endcomment %}
+              <span class="login-input-text bg-white text-muted"><i class="fa-solid fa-chevron-down"></i></span>
             </button>
           </a>
         </div>
         <div class="dropdown-menu">
           <a href="{%url 'trang-ca-nhan'%}" class="dropdown-link">
-            <img width="20" height="20" viewBox="0 0 32 32" src="{% static 'images/edit.png' %}">
+            <i class="fa-solid fa-pen-to-square"></i>
             &nbspThông tin cá nhân
           </a>
           <a href="{% url 'dang-xuat'%}" class="dropdown-link">
-            <img width="20" height="20" viewBox="0 0 32 32" src="{% static 'images/logout.png' %}">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
             &nbspĐăng xuất
           </a>
         </div>
@@ -68,64 +71,91 @@
       </button> -->
 
     </div>
-
-
   </header>
+
   <nav class="sidebar">
     <header>
-      <img src="{% static 'images/user.png' %}">
+      <img src="{% static 'images/profile.png' %}">
       <a href="#">
-        <h1>{{ user.username }}</h1>
+        <p>{{ user.username }}</p>
       </a>
     </header>
     {% if user.vai_tro == '1' %}
     <!-- Hiển thị tất cả các mục -->
     <a href="#" class="sidebar-link">
-        <img src="{% static 'images/home.png' %}">
-        Trang chủ
+      <img src="{% static 'images/houses.png' %}">
+      Trang chủ
     </a>
     <a href="{%url 'ds-giao-vien'%}" class="sidebar-link">
-        <img src="{% static 'images/teacher.png' %}">
-        Giáo viên
+      <img src="{% static 'images/teachers.png' %}">
+      Giáo viên
     </a>
     <a href="{%url 'hoc-sinh'%}" class="sidebar-link">
-        <img src="{% static 'images/student.png' %}">
-        Học sinh
+      <img src="{% static 'images/students.png' %}">
+      Học sinh
     </a>
     <a href="{%url 'lop-hoc'%}" class="sidebar-link">
-        <img src="{% static 'images/class.png' %}">
-        Lớp học
+      <img src="{% static 'images/classes.png' %}">
+      Lớp học
     </a>
     <a href="{%url 'mon-hoc'%}" class="sidebar-link">
-        <img src="{% static 'images/book.png' %}">
-        Môn học
+      <img src="{% static 'images/books.png' %}">
+      Môn học
     </a>
     <a href="{%url 'diem'%}" class="sidebar-link">
-        <img src="{% static 'images/report.png' %}">
-        Điểm
+      <img src="{% static 'images/score.png' %}">
+      Điểm
     </a>
     <a href="{%url 'tong-ket'%}" class="sidebar-link">
-        <img src="{% static 'images/search.png' %}">
-        Tổng kết
+      <img src="{% static 'images/searches.png' %}">
+      Báo cáo tổng kết
     </a>
-{% elif user.vai_tro == '3' %}
-    <!-- Hiển thị các mục phù hợp với vai_tro = 1 --> 
-{% else %}
+    {% elif user.vai_tro == '3' %}
+    <!-- Hiển thị các mục phù hợp với vai_tro = 1 -->
+    <a href="#" class="sidebar-link">
+      <img src="{% static 'images/home.png' %}">
+      Trang chủ
+    </a>
+    <a href="#" class="sidebar-link">
+      <img src="{% static 'images/student.png' %}">
+      Học sinh
+    </a>
+    <a href="#" class="sidebar-link">
+      <img src="{% static 'images/class.png' %}">
+      Lớp học
+    </a>
+    <a href="{%url 'mon-hoc'%}" class="sidebar-link">
+      <img src="{% static 'images/book.png' %}">
+      Môn học
+    </a>
+    <a href="#" class="sidebar-link">
+      <img src="{% static 'images/settings.png' %}">
+      Cài đặt
+    </a>
+    {% else %}
     <!-- Trường hợp không xác định -->
     <a href="#" class="sidebar-link">
-        <img src="{% static 'images/home.png' %}">
-        Trang chủ
+      <img src="{% static 'images/home.png' %}">
+      Trang chủ
     </a>
-{% endif %}
+    <a href="{%url 'quan-ly-diem'%}" class="sidebar-link">
+      <img src="{% static 'images/score.png' %}">
+      Điểm
+    </a>
+    <a href="{%url 'lop-chu-nhiem'%}" class="sidebar-link">
+      <img src="{% static 'images/classes.png' %}">
+      Lớp chủ nhiệm 
+    </a>
+    {% endif %}
 
   </nav>
 
   <main class="list-container">
-      {% block content %}
+    {% block content %}
 
-      {% endblock %}
+    {% endblock %}
   </main>
-  
+
   <script src="{% static 'js/main.js' %}"></script>
 </body>
 

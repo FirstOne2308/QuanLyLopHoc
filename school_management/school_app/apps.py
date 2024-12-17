@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.apps import AppConfig
 
 
@@ -6,4 +7,4 @@ class SchoolAppConfig(AppConfig):
     name = 'school_app'
 
     def ready(self):
-        import school_app.signals 
+        import school_app.signals

@@ -3,7 +3,15 @@
 {% block content %}
   <div class="tao-danh-sach-lop-container">
     <h2>Tạo danh sách lớp</h2>
-
+    {% if messages %}
+    <div class="alert alert-danger">
+      {% if 'full_class' in message.tags %}
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+      {% endif %}
+    </div>
+  {% endif %}
     <!-- Form lọc năm học và lớp -->
     <form method="GET" id="filter-form" class="filter-form">
         <label for="nam_hoc">Năm học:</label>
@@ -27,7 +35,7 @@
     <h3>Danh sách học sinh chưa có lớp</h3>
     <form method="POST" action="" onsubmit="return validateForm()">
       {% csrf_token %}
-      <table class="student-list">
+      <table class="student-list">  
         <thead>
           <tr>
             <th>Chọn</th>

@@ -68,6 +68,14 @@ class NamHoc(models.Model):
     def __str__(self):
         return self.nam
 
+from django.db.models.signals import post_migrate
+@receiver(post_migrate)
+def create_default_nam_hoc(sender, **kwargs):
+    current_year = datetime.now().year
+    for year in range(2021, current_year + 1):
+        nam_hoc = f"{year}-{year + 1}"
+        if not NamHoc.objects.filter(nam=nam_hoc).exists():
+            NamHoc.objects.create(nam=nam_hoc, tuoi_toi_da=20, tuoi_toi_thieu=14)
 
 # Lớp học
 class LopHoc(models.Model):
@@ -75,6 +83,7 @@ class LopHoc(models.Model):
     so_hoc_sinh = models.IntegerField(null=True)
     nam_hoc = models.ForeignKey(
         NamHoc, null=False, on_delete=models.CASCADE)
+    giao_vien_chu_nhiem = models.ForeignKey("GiaoVien", null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.nam_hoc.nam + '_' + self.ma_lop
@@ -113,7 +122,7 @@ class GiaoVien(models.Model):
     mon_day = models.ForeignKey(MonHoc, blank=True, on_delete=models.CASCADE)
     lop_day = models.ManyToManyField(LopHoc, blank=True)
     def __str__(self):
-        return self.nguoi_dung.username
+        return f'{self.nguoi_dung.ho_ten}({self.nguoi_dung.username})'
 
 
 # Bảng kết quả
@@ -216,19 +225,31 @@ class KetQuaMonHoc(models.Model):
 
 
 class KetQuaNamHoc(models.Model):
+    HANH_KIEM_CHOICES = [
+        ('Tot', 'Tốt'),
+        ('Kha', 'Khá'),
+        ('TrungBinh', 'Trung bình'),
+        ('Yeu', 'Yếu'),
+    ]
+
     hoc_sinh = models.ForeignKey(HocSinh, on_delete=models.CASCADE)
     nam_hoc = models.ForeignKey(NamHoc, on_delete=models.CASCADE)
-    
+
     diem_tong_ket = models.FloatField(null=True, blank=True)
     ket_qua = models.CharField(
         max_length=10,
         choices=[('Dat', 'Đạt'), ('KhongDat', 'Không đạt')],
         null=True, blank=True
     )
+    hanh_kiem = models.CharField(
+        max_length=10,
+        choices=HANH_KIEM_CHOICES,
+        null=True, blank=True
+    )
 
     def save(self, *args, **kwargs):
-        # Lấy tất cả các môn học trong năm học (vì học sinh học tất cả các môn)
-        mon_hocs = MonHoc.objects.all()  # Lấy tất cả các môn học
+        # Lấy tất cả các môn học trong năm học
+        mon_hocs = MonHoc.objects.all()
         total_points = 0
         total_subjects = 0
 
@@ -236,22 +257,27 @@ class KetQuaNamHoc(models.Model):
         for mon_hoc in mon_hocs:
             ket_qua_mon_hoc = KetQuaMonHoc.objects.filter(
                 hoc_sinh=self.hoc_sinh, mon_hoc=mon_hoc, nam_hoc=self.nam_hoc
-            ).first()  # Dùng first() để tránh lỗi nếu có nhiều kết quả
+            ).first()
 
             if ket_qua_mon_hoc and ket_qua_mon_hoc.diem_tong_ket is not None:
                 total_points += ket_qua_mon_hoc.diem_tong_ket
                 total_subjects += 1
 
-        # Tính điểm tổng kết của năm học (trung bình điểm của các môn)
+        # Tính điểm tổng kết của năm học
         if total_subjects > 0:
             self.diem_tong_ket = total_points / total_subjects
-            self.ket_qua = 'Dat' if self.diem_tong_ket >= 5 else 'KhongDat'
+
+        # Xét kết quả dựa trên điểm tổng kết và hạnh kiểm
+        if self.diem_tong_ket is not None:
+            if self.diem_tong_ket >= 5 and self.hanh_kiem != 'Yeu':
+                self.ket_qua = 'Dat'
+            else:
+                self.ket_qua = 'KhongDat'
 
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.hoc_sinh.nguoi_dung.username} - {self.nam_hoc.nam}"
-
+        return f"{self.hoc_sinh.nguoi_dung.username} - {self.nam_hoc.nam} - {self.ket_qua}"
 
 
 

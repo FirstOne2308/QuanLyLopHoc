@@ -1,66 +1,73 @@
 {% extends 'school_app/base.html' %}
+{% load static %}
 
 {% block content %}
-  <div class="hoc-sinh-container">
+<link href="{% static 'css/hoc_sinh.css' %}" rel="stylesheet" />
+<div class="ds-container">
+  <div class="hoc-sinh-add">
     <h2>Danh sách học sinh</h2>
-
-    <!-- Form tìm kiếm -->
-    <form method="GET" action="{% url 'hoc-sinh' %}">
-      <div class="search-container">
-        <input type="text" name="ten_hoc_sinh" value="{{ search_query }}" placeholder="Tìm kiếm học sinh" class="search-input">
-        <button type="submit" class="btn-search">Tìm kiếm</button>
-      </div>
-    </form>
-
-    <!-- Bảng danh sách học sinh -->  
-    <table class="student-list">
-      <thead>
-        <tr>
-          <th>STT</th>
-          <th>Họ và tên</th>
-          <th>Ngày sinh</th>
-          <th>Giới tính</th>
-          <th>Email</th>
-          <th>Địa chỉ</th>
-          <th>Hành động</th>  <!-- Cột hành động -->
-        </tr>
-      </thead>
-      <tbody>
-        {% for hocsinh in ds_hoc_sinh %}
-          <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ hocsinh.nguoi_dung.ho_ten }}</td>
-            <td>{{ hocsinh.nguoi_dung.ngay_sinh|date:"d/m/Y" }}</td>
-            {% if hocsinh.nguoi_dung.gioi_tinh == "1" %}
-              <td>Nam</td>
-            {% else %}
-              <td>Nữ</td>
-            {% endif %}
-            <td>{{ hocsinh.nguoi_dung.email }}</td>
-            <td>{{ hocsinh.nguoi_dung.dia_chi }}</td>
-            <td>
-              <!-- Nút sửa -->
-              <a href="{%url 'cap-nhat-hoc-sinh' hocsinh.id%}">
-                <button class="btn-edit">Sửa</button>
-              </a>
-              <!-- Nút xóa -->
-              <form action="{% url 'xoa-hoc-sinh' hocsinh.id %}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa học sinh này?');">
-                {% csrf_token %}
-                <button type="submit" class="btn-delete">Xóa</button>
-            </form>            
-            </td>
-          </tr>
-        {% empty %}
-          <tr>
-            <td colspan="7">Không có học sinh nào.</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
     <!-- Nút thêm học sinh mới -->
     <a href="{% url 'them-hoc-sinh' %}">
-      <button class="btn-add-student">Thêm học sinh mới</button>
+      <button class="btn-add">Thêm học sinh mới</button>
     </a>
   </div>
+
+  <!-- Form tìm kiếm -->
+  <form method="GET" action="{% url 'hoc-sinh' %}">
+    <div class="search-container">
+      <input type="text" name="ten_hoc_sinh" value="{{ search_query }}" placeholder="Tìm kiếm học sinh"
+        class="search-input">
+      <button type="submit" class="btn-search">Tìm kiếm</button>
+    </div>
+  </form>
+
+  <!-- Bảng danh sách học sinh -->
+  <table class="hoc-sinh-list">
+    <thead>
+      <tr>
+        <th>STT</th>
+        <th>Họ và tên</th>
+        <th>Ngày sinh</th>
+        <th>Giới tính</th>
+        <th>Email</th>
+        <th>Địa chỉ</th>
+        <th>Hành động</th> <!-- Cột hành động -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for hocsinh in ds_hoc_sinh %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ hocsinh.nguoi_dung.ho_ten }}</td>
+        <td>{{ hocsinh.nguoi_dung.ngay_sinh|date:"d/m/Y" }}</td>
+        {% if hocsinh.nguoi_dung.gioi_tinh == "1" %}
+        <td>Nam</td>
+        {% else %}
+        <td>Nữ</td>
+        {% endif %}
+        <td>{{ hocsinh.nguoi_dung.email }}</td>
+        <td>{{ hocsinh.nguoi_dung.dia_chi }}</td>
+        <td>
+          <!-- Nút sửa -->
+          <div class="hoc-sinh-wrap-btn">
+            <a href="{%url 'cap-nhat-hoc-sinh' hocsinh.id%}">
+              <button class="btn-edit">Sửa</button>
+            </a>
+            <!-- Nút xóa -->
+            <form action="{% url 'xoa-hoc-sinh' hocsinh.id %}" method="POST"
+              onsubmit="return confirm('Bạn có chắc muốn xóa học sinh này?');">
+              {% csrf_token %}
+              <button type="submit" class="btn-delete">Xóa</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7">Không có học sinh nào.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

@@ -11,6 +11,7 @@
             <th>Giới tính</th>
             <th>Email</th>
             <th>Địa chỉ</th>
+            <th>Hạnh kiểm</th>
             <th>Hành động</th>
         </tr>
     </thead>
@@ -28,7 +29,20 @@
             <td>{{ hocsinh.nguoi_dung.email }}</td>
             <td>{{ hocsinh.nguoi_dung.dia_chi }}</td>
             <td>
-                <form action="{%url 'xoa-hs-khoi-lop' lop_hoc.id hocsinh.id%}" method="POST"
+                <form action="{% url 'sua-hanh-kiem' lop_hoc.id hocsinh.id %}" method="POST">
+                    {% csrf_token %}
+                    <select name="hanh_kiem">
+                        <option value="" {% if not hocsinh.hanh_kiem %}selected{% endif %}>Chưa xét</option>
+                        <option value="Tot" {% if hocsinh.hanh_kiem == "Tot" %}selected{% endif %}>Tốt</option>
+                        <option value="Kha" {% if hocsinh.hanh_kiem == "Kha" %}selected{% endif %}>Khá</option>
+                        <option value="TrungBinh" {% if hocsinh.hanh_kiem == "TrungBinh" %}selected{% endif %}>Trung bình</option>
+                        <option value="Yeu" {% if hocsinh.hanh_kiem == "Yeu" %}selected{% endif %}>Yếu</option>
+                    </select>
+                    <button type="submit" class="btn-update">Cập nhật</button>
+                </form>
+            </td>
+            <td>
+                <form action="{% url 'xoa-hs-khoi-lop' lop_hoc.id hocsinh.id %}" method="POST"
                     onsubmit="return confirm('Bạn có chắc muốn xóa học sinh này khỏi lớp?');">
                     {% csrf_token %}
                     <button type="submit" class="btn-delete">Xóa</button>
@@ -37,12 +51,16 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="4">Không có học sinh nào trong lớp này</td>
+            <td colspan="8">Không có học sinh nào trong lớp này</td>
         </tr>
         {% endfor %}
-        <a href="{% url 'lop-hoc' %}?nam_hoc={{ lop_hoc.nam_hoc }}">
-            <button class="btn-back">Trở về</button>
-        </a>
     </tbody>
 </table>
+
+<a href="{% url 'lop-hoc' %}?nam_hoc={{ lop_hoc.nam_hoc }}">
+    <button class="btn-back">Trở về</button>
+</a>
+<a href="{% url 'xuat-ds-lop' lop_hoc.id %}"> 
+    <button class="btn-add">Xuất danh sách lớp</button>
+</a>
 {% endblock %}

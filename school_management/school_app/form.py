@@ -169,24 +169,49 @@ class HocSinhForm(NguoiDungForm):  # Kế thừa từ NguoiDungForm
 
 
 
+# class LopHocForm(forms.ModelForm):
+#     class Meta:
+#         model = LopHoc
+#         fields = ['ma_lop', 'so_hoc_sinh', 'nam_hoc']  # Các trường cần nhập vào form
+
+#     # Tùy chỉnh widget cho trường 'nam_hoc' nếu cần thiết (thêm select box)
+#     nam_hoc = forms.ModelChoiceField(
+#         queryset=NamHoc.objects.all(), 
+#         empty_label="Chọn năm học", 
+#         required=True  # Mặc định sẽ yêu cầu chọn năm học
+#     )
+    
+#     # Làm cho trường 'so_hoc_sinh' không bắt buộc
+#     so_hoc_sinh = forms.IntegerField(
+#         required=False,  # Không bắt buộc
+#         widget=forms.NumberInput(attrs={'placeholder': 'Số học sinh'}),
+#     )
+
+
 class LopHocForm(forms.ModelForm):
     class Meta:
         model = LopHoc
-        fields = ['ma_lop', 'so_hoc_sinh', 'nam_hoc']  # Các trường cần nhập vào form
+        fields = ['ma_lop', 'so_hoc_sinh', 'nam_hoc', 'giao_vien_chu_nhiem']  # Thêm 'giao_vien_chu_nhiem'
 
-    # Tùy chỉnh widget cho trường 'nam_hoc' nếu cần thiết (thêm select box)
+    # Tùy chỉnh widget cho trường 'nam_hoc' để hiển thị dưới dạng chọn năm học
     nam_hoc = forms.ModelChoiceField(
-        queryset=NamHoc.objects.all(), 
+        queryset=NamHoc.objects.all(),
         empty_label="Chọn năm học", 
-        required=True  # Mặc định sẽ yêu cầu chọn năm học
+        required=True  # Yêu cầu chọn năm học
     )
-    
+
     # Làm cho trường 'so_hoc_sinh' không bắt buộc
     so_hoc_sinh = forms.IntegerField(
-        required=False,  # Không bắt buộc
-        widget=forms.NumberInput(attrs={'placeholder': 'Số học sinh'}),
+        required=False,  # Trường này không bắt buộc
+        widget=forms.NumberInput(attrs={'placeholder': 'Số học sinh'}),  # Placeholder cho trường này
     )
 
+    # Thêm trường 'giao_vien_chu_nhiem' để chọn giáo viên chủ nhiệm
+    giao_vien_chu_nhiem = forms.ModelChoiceField(
+        queryset=GiaoVien.objects.all(),  # Lấy tất cả giáo viên từ cơ sở dữ liệu
+        required=False,  # Trường này không bắt buộc
+        empty_label="Chọn giáo viên chủ nhiệm",  # Lựa chọn mặc định
+    )
 
 class MonHocForm(forms.ModelForm):
     class Meta:

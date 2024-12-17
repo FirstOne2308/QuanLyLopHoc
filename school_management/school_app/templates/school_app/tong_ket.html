@@ -46,6 +46,25 @@
                 {% endfor %}
             </select>
         </form>
+        
+
+        {% if selected_nam_hoc %}
+        <div class="btn-group" style="margin-top: 20px;">
+            <button type="button" onclick="location.href='{% url 'ds-ket-qua-hoc-sinh' nam_hoc_id=selected_nam_hoc status='khong_dat' %}'">
+                Danh Sách Học Sinh Không Đạt
+            </button>
+            <button type="button" onclick="location.href='{% url 'ds-ket-qua-hoc-sinh' nam_hoc_id=selected_nam_hoc status='trung_binh' %}'">
+                Danh Sách Học Sinh Trung Bình
+            </button>
+            <button type="button" onclick="location.href='{% url 'ds-ket-qua-hoc-sinh' nam_hoc_id=selected_nam_hoc status='kha' %}'">
+                Danh Sách Học Sinh Khá
+            </button>
+            <button type="button" onclick="location.href='{% url 'ds-ket-qua-hoc-sinh' nam_hoc_id=selected_nam_hoc status='gioi' %}'">
+                Danh Sách Học Sinh Giỏi
+            </button>
+        </div>
+        {% endif %}
+
 
         {% if lop_data %}
         <canvas id="classComparisonChart" width="800" height="400"></canvas>

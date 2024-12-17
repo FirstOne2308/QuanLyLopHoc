@@ -1,0 +1,53 @@
+.hoc-sinh-add {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hoc-sinh-add h2 {
+    text-align: center;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.hoc-sinh-list {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.hoc-sinh-list th, .hoc-sinh-list td {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.hoc-sinh-list th {
+    background: #2c3e50;
+    color: #fff;
+}
+
+.hoc-sinh-list tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.hoc-sinh-list tr:hover {
+    background: #f1f1f1;
+}
+
+.hoc-sinh-list td {
+    vertical-align: middle;
+}
+
+.hoc-sinh-wrap-btn {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
+}
+
+.hoc-sinh-wrap-btn form {
+    width: unset;
+}

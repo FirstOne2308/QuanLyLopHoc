@@ -1,56 +1,58 @@
 {% extends 'school_app/base.html' %}
+{% load static %}
 
 {% block content %}
-  <div class="cap-nhat-hoc-sinh-container">
+<link href="{% static 'css/cap_nhat_hs.css' %}" rel="stylesheet" />
+<div class="ds-update-container">
     <h2>Cập nhật thông tin học sinh</h2>
 
     <!-- Hiển thị thông báo -->
     {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-                {% if 'update_student' in message.tags %}
-                    <div class="alert alert-success">
-                        {{ message }}
-                    </div>
-                {% endif %}
-            {% endfor %}
+    <div class="messages">
+        {% for message in messages %}
+        {% if 'update_student' in message.tags %}
+        <div class="alert alert-success">
+            {{ message }}
         </div>
+        {% endif %}
+        {% endfor %}
+    </div>
     {% endif %}
 
     <!-- Form cập nhật thông tin học sinh -->
     <form method="POST">
         {% csrf_token %}
-        
+
         <div class="input_field">
             <label for="username">Username</label>
             {{ form.username }}
         </div>
-    
+
         <div class="input_field">
             <label for="name">Họ và tên</label>
             {{ form.ho_ten }}
         </div>
-    
+
         <div class="input_field">
             <label for="dateOfBirth">Ngày sinh</label>
             {{ form.ngay_sinh }}
         </div>
-    
+
         <div class="input_field">
             <label for="sex">Giới tính</label>
             {{ form.gioi_tinh }}
         </div>
-    
+
         <div class="input_field">
             <label for="email">Email</label>
             {{ form.email }}
         </div>
-    
+
         <div class="input_field">
             <label for="address">Địa chỉ</label>
             {{ form.dia_chi }}
         </div>
-    
+
         <div class="input_field">
             <button type="submit" class="btn-submit">Lưu</button>
         </div>
@@ -60,6 +62,6 @@
     <a href="{% url 'hoc-sinh' %}">
         <button type="button" class="btn-cancel">Thoát</button>
     </a>
-  </div>
+</div>
 
 {% endblock %}

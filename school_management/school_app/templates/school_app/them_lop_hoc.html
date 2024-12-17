@@ -2,6 +2,13 @@
 
 {% block content %}
   <h3>Thêm lớp học mới</h3>
+  {% if messages %}
+    <div class="alert alert-danger">
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
   <form method="POST" class="form-them-lop">
     {% csrf_token %}
     
@@ -11,12 +18,25 @@
       {{ form.ma_lop }}
     </div>
     
+    
     <!-- Năm học -->
     <div class="form-group">
       <label for="id_nam_hoc">Năm học:</label>
       {{ form.nam_hoc }}
     </div>
-     
+    
+    <!-- Số học sinh -->
+    <div class="form-group">
+      <label for="id_so_hoc_sinh">Số học sinh:</label>
+      {{ form.so_hoc_sinh }}
+    </div>
+    
+    <!-- Giáo viên chủ nhiệm -->
+    <div class="form-group">
+      <label for="id_giao_vien_chu_nhiem">Giáo viên chủ nhiệm:</label>
+      {{ form.giao_vien_chu_nhiem}}
+    </div>
+    
     <!-- Nút submit -->
     <button type="submit" class="btn-submit">Thêm lớp học</button>
   </form>

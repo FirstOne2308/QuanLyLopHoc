@@ -1,8 +1,10 @@
 {% extends 'school_app/base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">Phân công giáo viên dạy</h2>
+<link href="{% static 'css/phan_cong_gv.css' %}" rel="stylesheet" />
+<div class="ds-container">
+    <h2>Phân công giáo viên dạy {{ mon_hoc.ten_mon }}</h2>
 
     <!-- Hiển thị thông báo nếu có -->
     {% if messages %}
@@ -32,11 +34,11 @@
             </select>
         </div>
 
-        <!-- Lớp học -->
+        <!-- Lớp học có thể phân công -->
         <div class="form-group mb-3">
-            <label for="id_lop_hoc">Lớp học:</label>
+            <label for="id_lop_hoc">Lớp học có thể phân công:</label>
             {% if lop_hoc_list %}
-                <table class="student-list">
+                <table class="phan-cong-list">
                     <thead>
                         <tr>
                             <th>STT</th>
@@ -57,39 +59,91 @@
                     </tbody>
                 </table>
             {% else %}
-                <p>Không có lớp học cho năm học này.</p>
+                <p>Không có lớp học có thể phân công cho năm học này.</p>
             {% endif %}
         </div>
 
+        <!-- Lớp học đã phân công cho giáo viên khác -->
+        <div class="form-group mb-3">
+            <label>Lớp học đã phân công cho các giáo viên khác:</label>
+            {% if lop_da_phan_cong_giao_vien_khac %}
+                <table class="phan-cong-list">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên lớp</th>
+                            <th>Năm học</th>
+                            <th>Giáo viên</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lop_hoc in lop_da_phan_cong_giao_vien_khac %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ lop_hoc.ma_lop }}</td>
+                                <td>{{ lop_hoc.nam_hoc.nam }}</td>
+                                <td>
+                                    {% for giao_vien in lop_hoc.giaovien_set.all %}
+                                        {% if giao_vien.mon_day == mon_hoc %}
+                                            {{ giao_vien.nguoi_dung.ho_ten }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Không có lớp học đã được phân công cho giáo viên khác.</p>
+            {% endif %}
+        </div>
+
+        <!-- Lớp học đã phân công cho giáo viên hiện tại -->
+        <div class="form-group mb-3">
+            <label>Lớp học đã phân công cho giáo viên hiện tại:</label>
+            {% if lop_da_phan_cong_giao_vien_hien_tai %}
+                <table class="phan-cong-list">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên lớp</th>
+                            <th>Năm học</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lop_hoc in lop_da_phan_cong_giao_vien_hien_tai %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ lop_hoc.ma_lop }}</td>
+                                <td>{{ lop_hoc.nam_hoc.nam }}</td>
+                                <td>
+                                    <!-- Nút hủy phân công -->
+                                    <a href="{% url 'huy-phan-cong' giao_vien.id lop_hoc.id %}" class="btn btn-danger btn-sm">
+                                        Hủy phân công
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Không có lớp học đã được phân công cho giáo viên này.</p>
+            {% endif %}
+        </div>
+        
+
         <!-- Nút hành động -->
-        <button type="submit" class="btn btn-save" id="saveBtn">Lưu</button>
-        <a href="{% url 'ds-giao-vien' %}" class="btn btn-cancel">Hủy</a>
+        <div>
+            <button type="submit" class="btn-submit">Lưu</button>
+        </div>
+        <a href="{% url 'ds-giao-vien' %}">
+            <button type="button" class="btn-cancel">Thoát</button>
+        </a>
     </form>
 </div>
 
 <script>
-    document.getElementById('saveBtn').addEventListener('click', function(event) {
-        const namHocSelect = document.getElementById('id_nam_hoc');
-        const lopHocCheckboxes = document.getElementsByName('lop_hoc');
-        let selectedNamHoc = namHocSelect.value;
-        let selectedLopHoc = false;
-
-        // Kiểm tra xem có lớp học nào được chọn không
-        for (let checkbox of lopHocCheckboxes) {
-            if (checkbox.checked) {
-                selectedLopHoc = true;
-                break;
-            }
-        }
-
-        // Nếu chưa chọn năm học hoặc lớp học, hiển thị thông báo
-        if (!selectedNamHoc || !selectedLopHoc) {
-            event.preventDefault();  // Ngừng form gửi
-            alert('Vui lòng chọn đầy đủ năm học và lớp học trước khi lưu.');
-        }
-    });
-
-    // Hàm để lọc lớp học theo năm học
     function filterLopHoc() {
         const namHocSelect = document.getElementById('id_nam_hoc');
         const selectedNamHoc = namHocSelect.value;
@@ -100,5 +154,14 @@
             window.location.href = url.toString();
         }
     }
+</script>
+<script>
+    document.querySelectorAll('.btn-danger').forEach(button => {
+        button.addEventListener('click', function(event) {
+            if (!confirm("Bạn có chắc chắn muốn hủy phân công lớp này?")) {
+                event.preventDefault();
+            }
+        });
+    });
 </script>
 {% endblock %}

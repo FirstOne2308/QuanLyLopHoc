@@ -1,6 +1,15 @@
 {% extends 'school_app/base.html' %}
 
 {% block content %}
+  {% if messages %}
+    <div class="alert alert-success">
+      {% if 'add_hs_lop' in message.tags %}
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+      {% endif %}
+    </div>
+  {% endif %}
   <div class="lop-hoc-container">
     <h2>Danh sách lớp học</h2>
 
@@ -51,6 +60,7 @@
             <th>Tên lớp</th>
             <th>Năm học</th>
             <th>Số lượng học sinh</th>
+            <th>Giáo viên chủ nhiệm</th>
             <th>Hành động</th>
           </tr>
         </thead>
@@ -60,6 +70,7 @@
               <td>{{ lop_hoc.ma_lop }}</td>
               <td>{{ lop_hoc.nam_hoc }}</td>
               <td>{{ lop_hoc.so_hs }}</td>
+              <td>{{ lop_hoc.giao_vien_chu_nhiem }}</td>
               <td>
                 <a href="{% url 'danh-sach-lop' lop_hoc.id %}">Xem danh sách</a> |
                 <form action="{% url 'xoa-lop-hoc' lop_hoc.id %}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lớp này?');">

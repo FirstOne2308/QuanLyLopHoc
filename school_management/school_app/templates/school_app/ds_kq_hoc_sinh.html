@@ -1,0 +1,43 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+<h1>Danh Sách Học Sinh 
+    {% if status == 'khong_dat' %}Không Đạt
+    {% elif status == 'trung_binh' %}Trung Bình
+    {% elif status == 'kha' %}Khá
+    {% elif status == 'gioi' %}Giỏi
+    {% else %}Không xác định
+    {% endif %}
+</h1>
+
+{% if hoc_sinh_list  %}
+<table>
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Họ tên</th>
+            <th>Lớp</th>
+            <th>Năm học</th>
+            <th>Điểm tổng kết</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for hoc_sinh in hoc_sinh_list  %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ hoc_sinh.ho_ten }}</td>
+            <td>{{ hoc_sinh.ma_lop }}</td>
+            <td>{{ hoc_sinh.nam_hoc }}</td>
+            <td>{{ hoc_sinh.diem_tong_ket|floatformat:2|default:"N/A" }}</td>
+            <td>{{ hoc_sinh.hanh_kiem|default:"Chưa xét" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% else %}
+<p>Không có học sinh nào trong danh sách này.</p>
+{% endif %}
+
+<a href="{% url 'tong-ket' %}?nam_hoc_id={{nam_hoc_id}}&mon_hoc_id={{''}} ">Quay lại</a>    
+{% endblock content %}

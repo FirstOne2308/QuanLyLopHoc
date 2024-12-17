@@ -1,0 +1,77 @@
+{% extends 'school_app/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Lớp Chủ Nhiệm</h2>
+
+    <!-- Form Lọc Năm Học -->
+    <form method="GET" action="{% url 'lop-chu-nhiem' %}">
+        <div class="form-group">
+            <label for="nam_hoc">Năm học:</label>
+            <select name="nam_hoc" id="nam_hoc" class="form-control">
+                <option value="">--- Chọn năm học ---</option>
+                {% for nh in nam_hoc_list %}
+                    <option value="{{ nh.id }}" {% if nh.id|stringformat:"s" == request.GET.nam_hoc %}selected{% endif %}>
+                        {{ nh.nam }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Lọc</button>
+    </form>
+
+    <!-- Danh sách học sinh -->
+    {% if hoc_sinh_list %}
+        <h3 class="mt-4">Danh sách học sinh lớp {{lop.ma_lop}}:</h3>
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Họ Tên</th>
+                    <th>Ngày Sinh</th>
+                    <th>Giới Tính</th>
+                    <th>Địa Chỉ</th>
+                    <th>Email</th>
+                    <th>Hạnh Kiểm</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hs in hoc_sinh_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ hs.nguoi_dung.ho_ten }}</td>
+                    <td>{{ hs.nguoi_dung.ngay_sinh|date:"d/m/Y" }}</td>
+                    <td>{{ hs.nguoi_dung.get_gioi_tinh_display }}</td>
+                    <td>{{ hs.nguoi_dung.dia_chi }}</td>
+                    <td>{{ hs.nguoi_dung.email }}</td>
+                    <td>
+                        <!-- Form Cập nhật hạnh kiểm -->
+                        <form action="{% url 'sua-hanh-kiem' lop.id hs.id %}" method="POST">
+                            {% csrf_token %}
+                            <select name="hanh_kiem">
+                                <option value="" {% if not hsinh.hanh_kiem %}selected{% endif %}>Chưa xét</option>
+                                <option value="Tot" {% if hs.hanh_kiem == "Tot" %}selected{% endif %}>Tốt</option>
+                                <option value="Kha" {% if hs.hanh_kiem == "Kha" %}selected{% endif %}>Khá</option>
+                                <option value="TrungBinh" {% if hs.hanh_kiem == "TrungBinh" %}selected{% endif %}>Trung bình</option>
+                                <option value="Yeu" {% if hs.hanh_kiem == "Yeu" %}selected{% endif %}>Yếu</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-sm mt-2">Cập nhật</button>
+                        </form>
+                    </td>
+
+                    <td>
+                        <form action="{% url 'xoa-hs-khoi-lop' lop.id hs.id %}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa học sinh này khỏi lớp?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="mt-4">Không có học sinh nào trong lớp này.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,8 +1,10 @@
 {% extends 'school_app/base.html' %}
+{% load static %}
 
 {% block content %}
-  <div class="them-hoc-sinh-container">
-    <h2>Cập nhật học sinh</h2>
+<link href="{% static 'css/them_hoc_sinh.css' %}" rel="stylesheet" />
+  <div class="ds-update-container">
+    <h2>Thêm học sinh</h2>
 
     <!-- Hiển thị thông báo -->
     {% if messages %}

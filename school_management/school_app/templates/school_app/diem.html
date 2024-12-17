@@ -73,7 +73,7 @@
         {% for ket_qua in ket_qua_list %}
           <tr>
             <td>{{ forloop.counter }}</td>
-            <td>{{ ket_qua.hoc_sinh.nguoi_dung.ho_ten }}</td>  <!-- Hiển thị tên học sinh -->
+            <td>{{ ket_qua.hoc_sinh.nguoi_dung.ho_ten }}</td>
             <td>{{ ket_qua.mon_hoc.ten_mon }}</td>
             <td>{{ ket_qua.hoc_ki }}</td>
             <td>{{ ket_qua.diem_15phut|default:0 }}</td>
@@ -82,7 +82,6 @@
             <td>{{ ket_qua.diem_ck|default:0 }}</td>
             <td>{{ ket_qua.diem_tong|default:0 }}</td>
             <td>
-                <!-- Nút chỉnh sửa -->
                 <a href="{% url 'cap-nhat-diem' ket_qua.id %}" class="btn-delete">Chỉnh sửa</a>
             </td>
           </tr>
@@ -95,6 +94,21 @@
     </table>
   </div>
 
+  <!-- Phân trang -->
+  <div class="pagination">
+    {% if ket_qua_list.has_previous %}
+      <a href="?page=1" class="page-link">Đầu</a>
+      <a href="?page={{ ket_qua_list.previous_page_number }}" class="page-link">Trước</a>
+    {% endif %}
+
+    <span class="current-page">Trang {{ ket_qua_list.number }} của {{ ket_qua_list.paginator.num_pages }}</span>
+
+    {% if ket_qua_list.has_next %}
+      <a href="?page={{ ket_qua_list.next_page_number }}" class="page-link">Sau</a>
+      <a href="?page={{ ket_qua_list.paginator.num_pages }}" class="page-link">Cuối</a>
+    {% endif %}
+  </div>
+
   <!-- Nút xuất điểm khi tất cả các trường được chọn -->
   {% if selected_nam_hoc and selected_lop_hoc and selected_mon_hoc and selected_hoc_ki %}
     <a href="{% url 'xuat-diem' %}?nam_hoc={{ selected_nam_hoc }}&lop_hoc={{ selected_lop_hoc }}&mon_hoc={{ selected_mon_hoc }}&hoc_ki={{ selected_hoc_ki }}"
@@ -102,5 +116,5 @@
       Xuất điểm
     </a>
   {% endif %}
-
+  
 {% endblock %}
