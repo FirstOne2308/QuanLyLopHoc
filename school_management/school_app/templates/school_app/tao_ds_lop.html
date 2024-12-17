@@ -14,65 +14,68 @@
   {% endif %}
     <!-- Form lọc năm học và lớp -->
     <form method="GET" id="filter-form" class="filter-form">
-        <label for="nam_hoc">Năm học:</label>
-        <select name="nam_hoc" id="nam_hoc" onchange="filterChange()">
+      <label for="nam_hoc">Năm học:</label>
+      <select name="nam_hoc" id="nam_hoc" onchange="filterChange()">
           <option value="">-- Chọn năm học --</option>
           {% for nam_hoc in nam_hoc_options %}
-            <option value="{{ nam_hoc.nam }}" {% if nam_hoc.nam == selected_nam_hoc %}selected{% endif %}>{{ nam_hoc.nam }}</option>
+              <option value="{{ nam_hoc.nam }}" {% if nam_hoc.nam == selected_nam_hoc %}selected{% endif %}>{{ nam_hoc.nam }}</option>
           {% endfor %}
-        </select>
-      
-        <label for="ten_lop">Tên lớp:</label>
-        <select name="ten_lop" id="ten_lop" onchange="filterChange()">
+      </select>
+  
+      <label for="ten_lop">Tên lớp:</label>
+      <select name="ten_lop" id="ten_lop" onchange="filterChange()">
           <option value="">-- Chọn lớp --</option>
           {% for ten_lop in ten_lop_options %}
-            <option value="{{ ten_lop.ma_lop }}" {% if ten_lop.ma_lop == selected_ten_lop %}selected{% endif %}>{{ ten_lop.ma_lop }}</option>
+              <option value="{{ ten_lop.id }}" {% if ten_lop.id|stringformat:"s" == selected_ten_lop %}selected{% endif %}>{{ ten_lop.ma_lop }}</option>
           {% endfor %}
-        </select>
-    </form>
+      </select>
+  </form>
+  
+  
 
     <!-- Danh sách học sinh chưa có lớp -->
     <h3>Danh sách học sinh chưa có lớp</h3>
     <form method="POST" action="" onsubmit="return validateForm()">
       {% csrf_token %}
-      <table class="student-list">  
-        <thead>
-          <tr>
-            <th>Chọn</th>
-            <th>STT</th>
-            <th>Họ và tên</th>
-            <th>Ngày sinh</th>
-            <th>Giới tính</th>
-            <th>Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for hocsinh in hoc_sinh_chua_co_lop %}
-            <tr>
-              <td>
-                <input type="checkbox" name="hoc_sinh_ids" value="{{ hocsinh.id }}">
-              </td>
-              <td>{{ forloop.counter }}</td>
-              <td>{{ hocsinh.nguoi_dung.ho_ten }}</td>
-              <td>{{ hocsinh.nguoi_dung.ngay_sinh|date:"d/m/Y" }}</td>
-              {% if hocsinh.nguoi_dung.gioi_tinh == "1" %}
-              <td>Nam</td>
-              {% else %}
-              <td>Nữ</td>
-              {% endif %}
-              <td>{{ hocsinh.nguoi_dung.email }}</td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="6">Không có học sinh nào chưa có lớp</td>
-            </tr>
-          {% endfor %}
-        </tbody>
+      <!-- Truyền id lớp qua POST -->
+      <input type="hidden" name="lop_id" value="{{ selected_ten_lop }}">
+      <table class="student-list">
+          <thead>
+              <tr>
+                  <th>Chọn</th>
+                  <th>STT</th>
+                  <th>Họ và tên</th>
+                  <th>Ngày sinh</th>
+                  <th>Giới tính</th>
+                  <th>Email</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for hocsinh in hoc_sinh_chua_co_lop %}
+                  <tr>
+                      <td><input type="checkbox" name="hoc_sinh_ids" value="{{ hocsinh.id }}"></td>
+                      <td>{{ forloop.counter }}</td>
+                      <td>{{ hocsinh.nguoi_dung.ho_ten }}</td>
+                      <td>{{ hocsinh.nguoi_dung.ngay_sinh|date:"d/m/Y" }}</td>
+                      <td>{% if hocsinh.nguoi_dung.gioi_tinh == "1" %}
+                        Nam
+                    {% else %}
+                        Nữ
+                    {% endif %}</td>
+                      <td>{{ hocsinh.nguoi_dung.email }}</td>
+                  </tr>
+              {% empty %}
+                  <tr>
+                      <td colspan="6">Không có học sinh nào chưa có lớp</td>
+                  </tr>
+              {% endfor %}
+          </tbody>
       </table>
-
-      <!-- Nút lưu danh sách -->
+  
       <button type="submit" class="btn-save">Lưu danh sách</button>
-    </form>
+  </form>
+  
+    
 
     <!-- Nút Thoát -->
     <a href="{% url 'lop-hoc' %}" class="btn-cancel">Thoát</a>

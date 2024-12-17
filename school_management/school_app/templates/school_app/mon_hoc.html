@@ -44,6 +44,10 @@
                         <button type="submit" class="btn-delete"
                             onclick="return confirm('Bạn có chắc chắn muốn xóa môn học này?')">Xóa</button>
                     </form>
+                    <form method="POST" action="{%url 'sua-mon-hoc' mon_hoc.id%}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-edit">Sửa</button>
+                    </form>
                 </td>
             </tr>
             {% empty %}

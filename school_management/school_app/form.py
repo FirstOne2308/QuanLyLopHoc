@@ -58,6 +58,15 @@ class NguoiDungForm(forms.ModelForm):
         })
     )
 
+    so_dien_thoai = forms.CharField(
+        label="",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'id': 'phone_user',
+            'class': 'form-control',    
+        })
+    )
+
     dia_chi = forms.CharField(
         label="",
         required=False,
@@ -71,7 +80,7 @@ class NguoiDungForm(forms.ModelForm):
 
     class Meta:
         model = NguoiDung
-        fields = ['username', 'password', 'ho_ten', 'ngay_sinh', 'gioi_tinh', 'email', 'dia_chi']
+        fields = ['username', 'password', 'ho_ten', 'ngay_sinh', 'gioi_tinh', 'email', 'so_dien_thoai', 'dia_chi']
 
 
 class CapNhatNguoiDungForm(forms.ModelForm):
@@ -117,6 +126,15 @@ class CapNhatNguoiDungForm(forms.ModelForm):
         })
     )
 
+    so_dien_thoai = forms.CharField(
+        label="",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'id': 'phone_user',
+            'class': 'form-control',
+        })
+    )
+
     dia_chi = forms.CharField(
         label="",
         required=False,
@@ -129,7 +147,7 @@ class CapNhatNguoiDungForm(forms.ModelForm):
 
     class Meta:
         model = NguoiDung
-        fields = ['username', 'ho_ten', 'ngay_sinh', 'gioi_tinh', 'email', 'dia_chi']
+        fields = ['username', 'ho_ten', 'ngay_sinh', 'gioi_tinh', 'email', 'so_dien_thoai', 'dia_chi']
 
 
 class HocSinhForm(NguoiDungForm):  # Kế thừa từ NguoiDungForm
@@ -330,3 +348,6 @@ class GiaoVienForm(NguoiDungForm):  # Kế thừa từ NguoiDungForm
             giao_vien.save()
 
         return giao_vien
+
+
+

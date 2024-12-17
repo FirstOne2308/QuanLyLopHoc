@@ -19,6 +19,7 @@
             <th>Lớp</th>
             <th>Năm học</th>
             <th>Điểm tổng kết</th>
+            <th>Hạnh kiểm</th>
         </tr>
     </thead>
     <tbody>
@@ -29,7 +30,19 @@
             <td>{{ hoc_sinh.ma_lop }}</td>
             <td>{{ hoc_sinh.nam_hoc }}</td>
             <td>{{ hoc_sinh.diem_tong_ket|floatformat:2|default:"N/A" }}</td>
-            <td>{{ hoc_sinh.hanh_kiem|default:"Chưa xét" }}</td>
+            <td>
+                {% if hoc_sinh.hanh_kiem == 'Yeu' %}
+                  Yếu
+                {% elif hoc_sinh.hanh_kiem == 'TrungBinh' %}
+                  Trung bình
+                {% elif hoc_sinh.hanh_kiem == 'Kha' %}
+                  Khá
+                {% elif hoc_sinh.hanh_kiem == 'Tot' %}
+                  Tốt
+                {% else %}
+                  Chưa xét
+                {% endif %}
+              </td>
         </tr>
         {% endfor %}
     </tbody>

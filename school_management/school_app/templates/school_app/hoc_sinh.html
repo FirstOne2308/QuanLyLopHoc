@@ -6,7 +6,6 @@
 <div class="ds-container">
   <div class="hoc-sinh-add">
     <h2>Danh sách học sinh</h2>
-    <!-- Nút thêm học sinh mới -->
     <a href="{% url 'them-hoc-sinh' %}">
       <button class="btn-add">Thêm học sinh mới</button>
     </a>
@@ -31,13 +30,13 @@
         <th>Giới tính</th>
         <th>Email</th>
         <th>Địa chỉ</th>
-        <th>Hành động</th> <!-- Cột hành động -->
+        <th>Hành động</th>
       </tr>
     </thead>
     <tbody>
-      {% for hocsinh in ds_hoc_sinh %}
+      {% for hocsinh in page_obj %}
       <tr>
-        <td>{{ forloop.counter }}</td>
+        <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
         <td>{{ hocsinh.nguoi_dung.ho_ten }}</td>
         <td>{{ hocsinh.nguoi_dung.ngay_sinh|date:"d/m/Y" }}</td>
         {% if hocsinh.nguoi_dung.gioi_tinh == "1" %}
@@ -48,12 +47,10 @@
         <td>{{ hocsinh.nguoi_dung.email }}</td>
         <td>{{ hocsinh.nguoi_dung.dia_chi }}</td>
         <td>
-          <!-- Nút sửa -->
           <div class="hoc-sinh-wrap-btn">
-            <a href="{%url 'cap-nhat-hoc-sinh' hocsinh.id%}">
+            <a href="{% url 'cap-nhat-hoc-sinh' hocsinh.id %}">
               <button class="btn-edit">Sửa</button>
             </a>
-            <!-- Nút xóa -->
             <form action="{% url 'xoa-hoc-sinh' hocsinh.id %}" method="POST"
               onsubmit="return confirm('Bạn có chắc muốn xóa học sinh này?');">
               {% csrf_token %}
@@ -69,5 +66,24 @@
       {% endfor %}
     </tbody>
   </table>
+
+  <!-- Điều hướng phân trang -->
+  <div class="pagination">
+    <span class="step-links">
+      {% if page_obj.has_previous %}
+      <a href="?page=1&ten_hoc_sinh={{ search_query }}">Trang đầu</a>
+      <a href="?page={{ page_obj.previous_page_number }}&ten_hoc_sinh={{ search_query }}">Trước</a>
+      {% endif %}
+
+      <span class="current">
+        Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}&ten_hoc_sinh={{ search_query }}">Tiếp</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}&ten_hoc_sinh={{ search_query }}">Trang cuối</a>
+      {% endif %}
+    </span>
+  </div>
 </div>
 {% endblock %}

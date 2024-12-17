@@ -20,8 +20,12 @@
         <button type="submit" class="btn btn-primary mt-2">Lọc</button>
     </form>
 
-    <!-- Danh sách học sinh -->
-    {% if hoc_sinh_list %}
+    {% if not request.GET.nam_hoc %}
+        <p class="alert alert-warning mt-3">Vui lòng chọn năm học để lọc danh sách lớp.</p>
+    {% endif %}
+
+    {% if hoc_sinh_list and request.GET.nam_hoc%}
+    <a href="{% url 'xem-ket-qua-lop' lop.id %}">Xem kết quả lớp</a>
         <h3 class="mt-4">Danh sách học sinh lớp {{lop.ma_lop}}:</h3>
         <table class="table table-bordered mt-3">
             <thead>
@@ -33,7 +37,6 @@
                     <th>Địa Chỉ</th>
                     <th>Email</th>
                     <th>Hạnh Kiểm</th>
-                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,7 +53,7 @@
                         <form action="{% url 'sua-hanh-kiem' lop.id hs.id %}" method="POST">
                             {% csrf_token %}
                             <select name="hanh_kiem">
-                                <option value="" {% if not hsinh.hanh_kiem %}selected{% endif %}>Chưa xét</option>
+                                <option value="" {% if not hs.hanh_kiem %}selected{% endif %}>Chưa xét</option>
                                 <option value="Tot" {% if hs.hanh_kiem == "Tot" %}selected{% endif %}>Tốt</option>
                                 <option value="Kha" {% if hs.hanh_kiem == "Kha" %}selected{% endif %}>Khá</option>
                                 <option value="TrungBinh" {% if hs.hanh_kiem == "TrungBinh" %}selected{% endif %}>Trung bình</option>
@@ -59,19 +62,19 @@
                             <button type="submit" class="btn btn-primary btn-sm mt-2">Cập nhật</button>
                         </form>
                     </td>
-
-                    <td>
-                        <form action="{% url 'xoa-hs-khoi-lop' lop.id hs.id %}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa học sinh này khỏi lớp?');">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
-                        </form>
-                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        <a href="{% url 'xuat-ds-lop' lop.id %}"> 
+            <button class="btn-add">Xuất danh sách lớp</button>
+        </a>
     {% else %}
         <p class="mt-4">Không có học sinh nào trong lớp này.</p>
     {% endif %}
+
+    
 </div>
+
 {% endblock %}
+    

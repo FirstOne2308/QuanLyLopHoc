@@ -1,0 +1,71 @@
+{% extends 'school_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Kết Quả Lớp {{ lop_hoc.ma_lop }}</title>
+</head>
+<body>
+    <h1>Kết Quả Lớp: {{ lop_hoc.ma_lop }} - Năm học: {{ lop_hoc.nam_hoc.nam }}</h1>
+
+    <!-- Form lọc kết quả -->
+    <form method="get">
+        <label for="hoc_ky">Học kỳ:</label>
+        <select name="hoc_ky" id="hoc_ky">
+            <option value="1" {% if hoc_ky == '1' %}selected{% endif %}>Học kỳ 1</option>
+            <option value="2" {% if hoc_ky == '2' %}selected{% endif %}>Học kỳ 2</option>
+        </select>
+
+        <label for="mon_hoc">Môn học:</label>
+        <select name="mon_hoc" id="mon_hoc">
+            <option value="">-- Chọn môn học --</option>
+            {% for mon_hoc in danh_sach_mon_hoc %}
+                <option value="{{ mon_hoc.id }}" {% if mon_hoc.id == mon_hoc_id %}selected{% endif %}>
+                    {{ mon_hoc.ten_mon }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Lọc kết quả</button>
+    </form>
+
+    <br>
+    <!-- Bảng kết quả -->
+    {% if ket_qua_lop %}
+        <table border="1" cellpadding="5">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Họ tên</th>
+                    <th>Điểm 15 phút</th>
+                    <th>Điểm 1 tiết</th>
+                    <th>Điểm giữa kỳ</th>
+                    <th>Điểm cuối kỳ</th>
+                    <th>Điểm tổng</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ket_qua in ket_qua_lop %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ ket_qua.ho_ten }}</td>
+                        <td>{{ ket_qua.diem_15phut|default:"-" }}</td>
+                        <td>{{ ket_qua.diem_1tiet|default:"-" }}</td>
+                        <td>{{ ket_qua.diem_gk|default:"-" }}</td>
+                        <td>{{ ket_qua.diem_ck|default:"-" }}</td>
+                        <td>{{ ket_qua.diem_tong|default:"-" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Vui lòng chọn học kỳ và môn học để xem kết quả.</p>
+    {% endif %}
+    <a href="javascript:history.back()" class="btn btn-secondary mt-3">Trở về</a>
+</body>
+</html>
+
+{%endblock%}

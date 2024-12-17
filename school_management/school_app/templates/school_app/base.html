@@ -82,7 +82,7 @@
     </header>
     {% if user.vai_tro == '1' %}
     <!-- Hiển thị tất cả các mục -->
-    <a href="#" class="sidebar-link">
+    <a href="{%url 'home'%}" class="sidebar-link">
       <img src="{% static 'images/houses.png' %}">
       Trang chủ
     </a>
@@ -112,29 +112,18 @@
     </a>
     {% elif user.vai_tro == '3' %}
     <!-- Hiển thị các mục phù hợp với vai_tro = 1 -->
-    <a href="#" class="sidebar-link">
+    <a href="{%url 'home'%}" class="sidebar-link">
       <img src="{% static 'images/home.png' %}">
       Trang chủ
     </a>
-    <a href="#" class="sidebar-link">
+    <a href="{%url 'ket-qua-hoc-tap'%}" class="sidebar-link">
       <img src="{% static 'images/student.png' %}">
-      Học sinh
+      Kết quả học tập
     </a>
-    <a href="#" class="sidebar-link">
-      <img src="{% static 'images/class.png' %}">
-      Lớp học
-    </a>
-    <a href="{%url 'mon-hoc'%}" class="sidebar-link">
-      <img src="{% static 'images/book.png' %}">
-      Môn học
-    </a>
-    <a href="#" class="sidebar-link">
-      <img src="{% static 'images/settings.png' %}">
-      Cài đặt
-    </a>
+    
     {% else %}
     <!-- Trường hợp không xác định -->
-    <a href="#" class="sidebar-link">
+    <a href="{%url 'home'%}" class="sidebar-link">
       <img src="{% static 'images/home.png' %}">
       Trang chủ
     </a>

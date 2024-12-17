@@ -82,6 +82,7 @@
 
 <h2>Điểm tổng kết cả năm</h2>
 <p>Điểm tổng kết: {{ ket_qua_nam_hoc.diem_tong_ket }}</p>
+<p>Hạnh kiểm: {{ ket_qua_nam_hoc.get_hanh_kiem_display }}</p>
 <p>Kết quả: {% if ket_qua_nam_hoc.ket_qua == 'Dat' %}Được lên lớp{% else %}Không đạt{% endif %}</p>
 {% else %}
 <p>Không có dữ liệu.</p>

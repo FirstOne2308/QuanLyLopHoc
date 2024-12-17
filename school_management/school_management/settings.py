@@ -49,6 +49,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'school_app.middlewares.AdminOnlyMiddleware',
+    'school_app.middlewares.TeacherOnlyMiddleware',
+    'school_app.middlewares.AdminAndTeacherMiddleware',
 ]
 
 ROOT_URLCONF = 'school_management.urls'

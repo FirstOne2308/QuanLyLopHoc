@@ -32,11 +32,12 @@
         </select>
       </div>
       
-      <button type="submit" class="filter-btn">Lọc</button>
+      <!-- <button type="submit" class="filter-btn">Lọc</button> -->
   </form>
 </div>
 
 <div class="student-list-container">
+  {%if ket_qua_list%}
   <table class="student-list">
       <thead>
           <tr>
@@ -69,7 +70,9 @@
           {% endfor %}
       </tbody>
   </table>
-
+  {%else%}
+    <p>Vui lòng chọn các tiêu chí để lọc điểm</p>
+  {%endif%}
   <!-- Nút xuất điểm khi đủ các trường được chọn -->
   {% if selected_nam_hoc and selected_lop_hoc and selected_hoc_ki %}
     <a href="{% url 'xuat-diem' %}?nam_hoc={{ selected_nam_hoc }}&lop_hoc={{ selected_lop_hoc }}&mon_hoc={{ mon_hoc }}&hoc_ki={{ selected_hoc_ki }}"

@@ -12,89 +12,135 @@ from django.contrib.messages import get_messages
 from django.db.models import Count
 from django.db.models import Avg
 from django.contrib.auth.decorators import user_passes_test
+from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
+from django.core.paginator import Paginator
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
-def check_role(user):
-    return user.is_authenticated and user.vai_tro != "Quản trị viên"  # check quyền
+# def check_role(user):
+#     return user.is_authenticated and user.vai_tro != "Quản trị viên"  # check quyền
 
 
 # Create your views here.
+#Trang chủ 
 @login_required(login_url='dang-nhap')
-def base(request):
-    return render(request, 'school_app/base.html')
+def home(request):
+    """
+        Home: giao diện trang chủ của tất cả người dùng
 
+        Input: request
+
+        Trả về: giao diện trang chủ 
+    """
+    return render(request, 'school_app/home.html')
+
+#Đăng nhập 
 def dangnhap(request):
+    """
+        Trang đăng nhập
+
+        Input: request
+
+        Trả về: giao diện trang đăng nhập
+    """
     return render(request, 'school_app/dang_nhap.html')
 
+#Xử lý đăng nhập
 def xulydangnhap(request):
     """
     Hàm xử lý logic đăng nhập.
+
+    Input: request, username, password
+
+    Trả về:
+        - Nếu đăng nhập sai, trả về thông báo lỗi "Tên đăng nhập hoặc mật khẩu không chính xác!"
+        - Nếu đăng nhập đúng, chuyển người dùng tới giao diện trang chủ
     """
     if request.method == "POST":
-        # Lấy thông tin từ form
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        # Dùng authenticate để xác thực thông tin
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            # Nếu thông tin hợp lệ, đăng nhập
             login(request, user)
-            # messages.success(request, "Đăng nhập thành công!")
-
-            # Dựa vào vai trò, điều hướng người dùng đến trang phù hợp
             if user.vai_tro == '1':
                 return redirect('/')
             elif user.vai_tro == '2':
-                return redirect('quan-ly-diem')
+                return redirect('/')
             elif user.vai_tro == '3':
-                return redirect('ket-qua-hoc-tap')
+                return redirect('/')
         else:
-            # Thêm thông báo lỗi nếu thông tin không hợp lệ
             messages.error(request, "Tên đăng nhập hoặc mật khẩu không chính xác!")
 
-    # Render giao diện login
     return render(request, 'school_app/dang_nhap.html')
 
+
+#Đăng xuất
 @login_required(login_url='dang-nhap')
 def dang_xuat(request):
+    """
+    Hàm xử lý đăng xuất:
+
+    Input: request
+
+    Trả về: chuyển hướng đến giao diện đăng nhập
+    """
     logout(request)
     return redirect("/")
 
+
+#Trang cá nhân
 @login_required(login_url='dang-nhap')
 def trang_ca_nhan(request):
+    """
+    Trang cá nhân
+
+    Input: request
+
+    Trả về: chuyển hướng đến giao diện trang cá nhân gồm các thông tin cá nhân của người dùng
+    """
     return render(request, 'school_app/trang_ca_nhan.html')
 
+
+#Thêm học sinh
 @login_required(login_url='dang-nhap')
 def them_hoc_sinh(request):
+    """
+    Trang thêm mới học sinh
+
+    Input: request, thông tin của học sinh như username, ho_ten, ngay_sinh,...
+
+    Trả vè: 
+        - Nếu thêm học sinh thành công: trả về thông báo Thêm thành công
+        - Nếu thêm học sinh thất bại: trả về thông báo Không thể thêm 
+            (Vì lý do tên đăng nhập hoặc email đã có)
+    """
     form = HocSinhForm(request.POST or None)
     context = {
         'form': form,
     }
-    storage = get_messages(request)  # Lấy thông báo đã lưu
-    for message in storage:  # Tiêu thụ thông báo (không bắt buộc)
+    storage = get_messages(request)  
+    for message in storage:  
         print(f"Message: {message}")
     
     if request.method == 'POST':
         if form.is_valid():
             username = form.cleaned_data.get('username')
-            # password = form.cleaned_data.get('password')
             ho_ten = form.cleaned_data.get('ho_ten')
             ngay_sinh = form.cleaned_data.get('ngay_sinh')
             gioi_tinh = form.cleaned_data.get('gioi_tinh')
             email = form.cleaned_data.get('email')
             dia_chi = form.cleaned_data.get('dia_chi')
-
-            # Tạo mật khẩu từ ngày sinh (định dạng DDMMYYYY)
             if ngay_sinh:
-                # Giả sử ngày sinh có định dạng YYYY-MM-DD
-                ngay_sinh_str = ngay_sinh.strftime('%d%m%Y')  # Định dạng ngày sinh thành "DDMMYYYY"
-                password = ngay_sinh_str  # Dùng mật khẩu là ngày sinh đã định dạng
+                ngay_sinh_str = ngay_sinh.strftime('%d%m%Y')  
+                password = ngay_sinh_str  
 
             try:
                 user = NguoiDung.objects._create_user(
                     username=username, 
-                    password=password,  # Dùng mật khẩu đã tạo
+                    password=password,  
                     ho_ten=ho_ten,
                     vai_tro='3',
                     ngay_sinh=ngay_sinh,
@@ -111,77 +157,102 @@ def them_hoc_sinh(request):
             except Exception as e:
                 print(e)
                 logger.error(f"Lỗi khi thêm học sinh: {e}")
-                messages.error(request, "Không thể thêm", extra_tags='add_student')
+                messages.error(request, "Không thể thêm do tên đăng nhập hoặc email đã tồn tại", extra_tags='add_student')
         else:
             messages.error(request, "Dữ liệu không phù hợp", extra_tags='add_student')
     
     return render(request, 'school_app/them_hoc_sinh.html', context=context)
 
 
-
+#Lấy danh sách tất cả học sinh
 @login_required(login_url='dang-nhap')
 def hoc_sinh(request):
-    # Lấy từ khóa tìm kiếm từ GET (nếu có)
-    search_query = request.GET.get('ten_hoc_sinh', '')
+    """
+    Trang danh sách học sinh
 
-    # Lọc danh sách học sinh theo từ khóa tìm kiếm nếu có
+    Input: request, query(tên học sinh)
+
+    Trả về: Danh sách học sinh sắp xếp theo tên và được phân trang
+    """
+    search_query = request.GET.get('ten_hoc_sinh', '')
     if search_query:
         ds_hoc_sinh = HocSinh.objects.filter(
-            nguoi_dung__ho_ten__icontains=search_query
-        ).order_by('nguoi_dung__ho_ten')
+            nguoi_dung__ho_ten__icontains=search_query)
+        ds_hoc_sinh = sorted(ds_hoc_sinh, key=lambda hocsinh: hocsinh.nguoi_dung.ho_ten.split()[-1].lower())
     else:
-        ds_hoc_sinh = HocSinh.objects.all().order_by('nguoi_dung__ho_ten')
+        ds_hoc_sinh = HocSinh.objects.all()
+        ds_hoc_sinh = sorted(ds_hoc_sinh, key=lambda hocsinh: hocsinh.nguoi_dung.ho_ten.split()[-1].lower())
 
-    # Truyền danh sách học sinh vào template
+    # Phân trang
+    paginator = Paginator(ds_hoc_sinh, 10)  # Mỗi trang hiển thị 10 học sinh
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'school_app/hoc_sinh.html', {
-        'ds_hoc_sinh': ds_hoc_sinh,
+        'page_obj': page_obj,
         'search_query': search_query
     })
 
+
+# Cập nhật thông tin học sinh
 @login_required(login_url='dang-nhap')
 def cap_nhat_hoc_sinh(request, hoc_sinh_id):
-    # Lấy đối tượng HocSinh từ cơ sở dữ liệu
+    """
+    Trang cập nhật học sinh
+
+    Input: request, thông tin cần cập nhật như username, ho_ten,...
+
+    Trả về: 
+        - Nếu cập nhật thành công, thông báo thành công 
+        - Nếu cập nhật thất bại, thông báo không thể cập nhật
+    """
     hoc_sinh = get_object_or_404(HocSinh, id=hoc_sinh_id)
     print(hoc_sinh)
-    # Nếu là phương thức POST, nghĩa là người dùng đang gửi thông tin
     if request.method == "POST":
         form = CapNhatNguoiDungForm(request.POST, instance=hoc_sinh.nguoi_dung)
         if form.is_valid():
             try:
-                # Lưu thông tin cập nhật
                 form.save()
-
-                # Thông báo thành công
                 messages.success(request, "Cập nhật thành công", extra_tags='update_student')
-
-                # Chuyển hướng về trang danh sách học sinh sau khi cập nhật
-                return redirect('cap-nhat-hoc-sinh', hoc_sinh_id = hoc_sinh_id)  # URL danh sách học sinh
+                return redirect('cap-nhat-hoc-sinh', hoc_sinh_id = hoc_sinh_id) 
             except Exception as e:
                 print(e)
                 messages.error(request, "Có lỗi khi cập nhật học sinh", extra_tags='update_student')
     else:
-        # Nếu là GET, form sẽ được khởi tạo với dữ liệu hiện tại
         form = CapNhatNguoiDungForm(instance=hoc_sinh.nguoi_dung)
 
     return render(request, 'school_app/cap_nhat_hs.html', {'form': form})
 
+
+# Xóa học sinh
 @login_required(login_url='dang-nhap')
 def xoa_hoc_sinh(request, hoc_sinh_id):
+    """
+    Xóa học sinh
+
+    Input: request, hoc_sinh_id
+
+    Trả về: Thông báo xóa thành công, chuyển hướng về lại trang danh sách học sinh
+    """
     hoc_sinh = get_object_or_404(HocSinh, id=hoc_sinh_id)
     nguoi_dung = NguoiDung.objects.filter(username=hoc_sinh.nguoi_dung.username)
     if request.method == 'POST':
-        nguoi_dung.delete()  # Xóa học sinh
+        nguoi_dung.delete()  
         messages.success(request, "Xóa học sinh thành công!")
     return redirect('hoc-sinh')
 
-
+# Danh sách tất cả lớp học
 @login_required(login_url='dang-nhap')
 def lop_hoc(request):
-    # Lấy năm học mới nhất
-    # nam_hoc_moi_nhat = NamHoc.objects.order_by('-nam').first()
+    """
+    Danh sách lớp học
+
+    Input: request
+
+    Trả về: Chuyển hướng người dùng tới trang danh sách các lớp học
+    """
     lop_hoc_list = LopHoc.objects.all()
     lop_hoc_list = lop_hoc_list.annotate(so_hs=Count('hocsinh'))
-    # Lọc theo năm học (nếu có)
     current_nam_hoc = request.GET.get('nam_hoc', None)
     if current_nam_hoc:
         try:
@@ -189,59 +260,41 @@ def lop_hoc(request):
             lop_hoc_list = lop_hoc_list.filter(nam_hoc=nam_hoc_obj)
             lop_hoc_list = lop_hoc_list.annotate(so_hs=Count('hocsinh'))
         except NamHoc.DoesNotExist:
-            # Nếu không tìm thấy năm học phù hợp, không lọc
             lop_hoc_list = lop_hoc_list.none()
 
-    # Lọc theo tên lớp (nếu có)
-    # ten_lop = request.GET.get('ten_lop', '')
-    # if ten_lop:
-    #     lop_hoc_list = lop_hoc_list.filter(ma_lop=ten_lop)
-
-    # Lấy danh sách các năm học để hiển thị trong form lọc
     nam_hoc_options = NamHoc.objects.all()
-
-    # Lấy danh sách các mã lớp để hiển thị trong dropdown tên lớp
     ten_lop_options = LopHoc.objects.values_list('ma_lop', flat=True).distinct()
 
     return render(request, 'school_app/lop_hoc.html', {
         'lop_hoc_list': lop_hoc_list,
         'nam_hoc_options': nam_hoc_options,
-        'ten_lop_options': ten_lop_options,  # Thêm danh sách lớp vào context
+        'ten_lop_options': ten_lop_options,  
         'current_nam_hoc': current_nam_hoc,
-        # 'current_ten_lop': ten_lop,
     })
 
-# @login_required(login_url='dang-nhap')
-# def them_lop_hoc(request):
-#     if request.method == 'POST':
-#         form = LopHocForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, "Thêm lớp học thành công!")
-#             return redirect('lop-hoc')  # Chuyển hướng về trang danh sách lớp học
-#     else:
-#         form = LopHocForm()
-    
-#     return render(request, 'school_app/them_lop_hoc.html', {'form': form})
+
+# Thêm lớp học mới
 @login_required(login_url='dang-nhap')
 def them_lop_hoc(request):
+    """
+    Trang thêm lớp học
+
+    Input: request, thông tin lớp học như: ma_lop, so_hoc_sinh, nam_hoc
+
+    Trả về: Chuyển hướng người dùng tới trang thêm lớp học, form tạo lớp học
+    """
     if request.method == 'POST':
         form = LopHocForm(request.POST)
         
         if form.is_valid():
-            # Lấy năm học và giáo viên chủ nhiệm từ form
             nam_hoc = form.cleaned_data['nam_hoc']
             giao_vien_chu_nhiem = form.cleaned_data['giao_vien_chu_nhiem']
-            
-            # Kiểm tra xem giáo viên đã làm chủ nhiệm lớp khác trong cùng năm học chưa
             if LopHoc.objects.filter(nam_hoc=nam_hoc, giao_vien_chu_nhiem=giao_vien_chu_nhiem).exists():
                 messages.error(request, "Giáo viên đã làm chủ nhiệm lớp trong năm học này!")
                 return render(request, 'school_app/them_lop_hoc.html', {'form': form})
-            
-            # Nếu không có lớp nào của giáo viên trong năm học đó, thì lưu lớp học mới
             lop_hoc = form.save()
             messages.success(request, "Thêm lớp học thành công!")
-            return redirect('lop-hoc')  # Chuyển hướng về trang danh sách lớp học
+            return redirect('lop-hoc')  
     
     else:
         form = LopHocForm()
@@ -249,55 +302,62 @@ def them_lop_hoc(request):
     return render(request, 'school_app/them_lop_hoc.html', {'form': form})
 
 
+#Tạo danh sách lớp(Thêm học sinh vào lớp)
 @login_required(login_url='dang-nhap')
 def tao_danh_sach_lop(request):
     nam_hoc_options = NamHoc.objects.all()
     ten_lop_options = LopHoc.objects.all()
 
     selected_nam_hoc = request.GET.get('nam_hoc')
-    selected_ten_lop = request.GET.get('ten_lop')
+    selected_ten_lop = request.GET.get('ten_lop')  # Đây sẽ là `id` của lớp học
 
     lop_hoc_nam_hoc = LopHoc.objects.all()
     hoc_sinh_chua_co_lop = HocSinh.objects.all()
+
+    # Lọc danh sách lớp và học sinh theo năm học
     if selected_nam_hoc:
         try:
             nam_hoc = NamHoc.objects.get(nam=selected_nam_hoc)
             ten_lop_options = ten_lop_options.filter(nam_hoc=nam_hoc)
             lop_hoc_nam_hoc = lop_hoc_nam_hoc.filter(nam_hoc=nam_hoc)
-            hoc_sinh_chua_co_lop = HocSinh.objects.exclude(lop_hoc__in=lop_hoc_nam_hoc)  # Loại trừ học sinh thuộc bất kỳ lớp nào của năm học này
-        
+            hoc_sinh_chua_co_lop = HocSinh.objects.exclude(lop_hoc__in=lop_hoc_nam_hoc)
         except NamHoc.DoesNotExist:
             nam_hoc = None  
 
+    # Lọc danh sách học sinh chưa có lớp nếu lớp được chọn
     if selected_ten_lop:
-        hoc_sinh_chua_co_lop = hoc_sinh_chua_co_lop.exclude(lop_hoc__ma_lop=selected_ten_lop)
+        hoc_sinh_chua_co_lop = hoc_sinh_chua_co_lop.exclude(lop_hoc__id=selected_ten_lop)
 
+    # Xử lý thêm học sinh vào lớp
     if request.method == 'POST':
         hoc_sinh_ids = request.POST.getlist('hoc_sinh_ids')
-        if hoc_sinh_ids:
+        lop_id = request.POST.get('lop_id')  # Nhận id lớp từ POST
+
+        if lop_id:
             try:
-                lop_hoc = LopHoc.objects.get(ma_lop=selected_ten_lop)
+                lop_hoc = LopHoc.objects.get(id=lop_id)
                 so_hien_tai = lop_hoc.hocsinh_set.count()
-    
-                if so_hien_tai == lop_hoc.so_hoc_sinh:
+
+                if so_hien_tai + len(hoc_sinh_ids)>= lop_hoc.so_hoc_sinh:
                     messages.error(
                         request,
                         f"Lớp {lop_hoc.ma_lop} đã đủ học sinh ({so_hien_tai}/{lop_hoc.so_hoc_sinh}). Không thể thêm học sinh mới.",
                         extra_tags='full_class'
                     )
                 else:
-                    nam_hoc = lop_hoc.nam_hoc.nam
-                    list(map(lambda hoc_sinh_id: HocSinh.objects.get(id=hoc_sinh_id).lop_hoc.add(lop_hoc), hoc_sinh_ids))
-                    messages.success(
-                            request,
-                            f"Học sinh đã được thêm vào lớp {lop_hoc.ma_lop}.",
-                            extra_tags='add_hs_lop'
-                        )
-                    return redirect(f'/lop-hoc?nam_hoc={nam_hoc}')  
-            except LopHoc.DoesNotExist:
-                pass  
+                    for hoc_sinh_id in hoc_sinh_ids:
+                        hoc_sinh = HocSinh.objects.get(id=hoc_sinh_id)
+                        hoc_sinh.lop_hoc.add(lop_hoc)
 
-    # Render template với các dữ liệu cần thiết
+                    messages.success(
+                        request,
+                        f"Học sinh đã được thêm vào lớp {lop_hoc.ma_lop}.",
+                        extra_tags='add_hs_lop'
+                    )
+                    return redirect(f'/lop-hoc?nam_hoc={lop_hoc.nam_hoc.nam}')  
+            except LopHoc.DoesNotExist:
+                messages.error(request, "Lớp học không tồn tại.", extra_tags="invalid_lop_hoc")
+
     return render(request, 'school_app/tao_ds_lop.html', {
         'nam_hoc_options': nam_hoc_options,
         'ten_lop_options': ten_lop_options,
@@ -307,22 +367,22 @@ def tao_danh_sach_lop(request):
     })
 
 
-@login_required(login_url='dang-nhap')
-# def danh_sach_lop(request, lop_id):
-#     lop_hoc = get_object_or_404(LopHoc, id=lop_id)
-#     ds_hoc_sinh = HocSinh.objects.filter(lop_hoc = lop_hoc)
-#     ds_hoc_sinh = sorted(ds_hoc_sinh, key=lambda hocsinh: hocsinh.nguoi_dung.ho_ten.split()[-1].lower())
-#     return render(request, 'school_app/ds_lop.html',{
-#         'lop_hoc': lop_hoc,
-#         'ds_hoc_sinh': ds_hoc_sinh
-#     })
-def danh_sach_lop(request, lop_id):
-    lop_hoc = get_object_or_404(LopHoc, id=lop_id)
-    ds_hoc_sinh = HocSinh.objects.filter(lop_hoc=lop_hoc)  # Lọc học sinh theo lớp
 
-    # Duyệt qua từng học sinh để lấy thông tin hạnh kiểm
+# Xem danh sách lớp
+@login_required(login_url='dang-nhap')
+
+def danh_sach_lop(request, lop_id):
+    """
+    Trang danh sách lớp 
+
+    Input: request, lop_id
+
+    Trả về: Chuyển hướng người dùng tới trang danh sách các học sinh của lớp học đó
+    """
+    lop_hoc = get_object_or_404(LopHoc, id=lop_id)
+    ds_hoc_sinh = HocSinh.objects.filter(lop_hoc=lop_hoc)
+    ds_hoc_sinh = sorted(ds_hoc_sinh, key=lambda hocsinh: hocsinh.nguoi_dung.ho_ten.split()[-1].lower())
     for hocsinh in ds_hoc_sinh:
-        # Lấy thông tin hạnh kiểm của học sinh theo năm học hiện tại
         ket_qua_nam_hoc = KetQuaNamHoc.objects.filter(
             hoc_sinh=hocsinh,
             nam_hoc=lop_hoc.nam_hoc
@@ -336,48 +396,54 @@ def danh_sach_lop(request, lop_id):
         'lop_hoc': lop_hoc,
         'ds_hoc_sinh': ds_hoc_sinh
     })
-from django.views.decorators.csrf import csrf_exempt
 
+
+# Sửa hạnh kiểm cho từng học sinh
 @csrf_exempt
 def sua_hanh_kiem(request, lop_id, hoc_sinh_id):
+    """
+    Sửa hạnh kiểm
+
+    Input: request, lop_id, hoc_sinh_id
+
+    Ghi chú: chỉ có admin hoặc giáo viên chủ nhiệm mới có quyền chỉnh sửa hạnh kiểm 
+
+    Trả về: Trả về trang danh sách học sinh lớp học đó có hạnh kiểm đã được cập nhật
+    """
     if request.method == "POST":
         hanh_kiem = request.POST.get('hanh_kiem')
         lop_hoc = get_object_or_404(LopHoc, id=lop_id)
         hoc_sinh = get_object_or_404(HocSinh, id=hoc_sinh_id)
-
-        # Lấy năm học từ lớp học
         nam_hoc = lop_hoc.nam_hoc
-
-        # Tìm kết quả của học sinh trong năm học hiện tại
         ket_qua_nam_hoc = KetQuaNamHoc.objects.filter(
             hoc_sinh=hoc_sinh, nam_hoc=nam_hoc
         ).first()
-
         if ket_qua_nam_hoc:
-            # Cập nhật hạnh kiểm cho học sinh trong năm học đó
             ket_qua_nam_hoc.hanh_kiem = hanh_kiem
             ket_qua_nam_hoc.save()
-
-        # Quay lại danh sách lớp
         return redirect(request.META.get('HTTP_REFERER'))
     
+
+# Xuất danh sách lớp
 @login_required(login_url='dang-nhap')
 def xuat_ds_lop(request, lop_hoc_id):
-    # Lấy thông tin lớp học và danh sách học sinh
+    """
+    Xuất danh sách lớp
+
+    Input: request, lop_id
+
+    Ghi chú: chỉ có admin hoặc giáo viên chủ nhiệm mới có quyền xuất danh sách lớp
+
+    Trả về: file excel chứa thông tin học sinh của lớp đó
+    """
     lop_hoc = LopHoc.objects.get(id=lop_hoc_id)
     ds_hoc_sinh = HocSinh.objects.filter(lop_hoc=lop_hoc)
     ds_hoc_sinh = sorted(ds_hoc_sinh, key=lambda hocsinh: hocsinh.nguoi_dung.ho_ten.split()[-1].lower())
-
-    # Tạo workbook mới và sheet
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = f"Danh sách lớp {lop_hoc.ma_lop}"
-
-    # Thêm tiêu đề cột vào sheet
     headers = ["STT", "Họ và tên", "Ngày sinh", "Giới tính", "Email", "Địa chỉ"]
     ws.append(headers)
-
-    # Thêm dữ liệu học sinh vào sheet
     for index, hocsinh in enumerate(ds_hoc_sinh, start=1):
         row = [
             index,
@@ -388,18 +454,24 @@ def xuat_ds_lop(request, lop_hoc_id):
             hocsinh.nguoi_dung.dia_chi
         ]
         ws.append(row)
-
-    # Tạo phản hồi HTTP với kiểu file Excel
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="danh_sach_lop_{lop_hoc.ma_lop}.xlsx"'
-
-    # Lưu file Excel vào response để tải về
     wb.save(response)
     return response
 
 
+# Xóa học sinh khỏi lớp 
 @login_required(login_url='dang-nhap')
 def xoa_hs_khoi_lop(request, lop_id, hoc_sinh_id):
+    """
+    Xóa học sinh khỏi lớp
+
+    Input: request, lop_id, hoc_sinh_id
+
+    Ghi chú: chỉ có quản trị viên mới có quyền xóa học sinh ra khỏi lớp
+
+    Trả về: trang danh sách lớp đó sau khi xóa và thông báo đã xóa học sinh khỏi lớp thành công
+    """
     if request.method == 'POST':
         hoc_sinh = get_object_or_404(HocSinh, id = hoc_sinh_id)
         lop_hoc = get_object_or_404(LopHoc, id = lop_id)
@@ -411,6 +483,15 @@ def xoa_hs_khoi_lop(request, lop_id, hoc_sinh_id):
 
 @login_required(login_url='dang-nhap')
 def xoa_lop_hoc(request, lop_id):
+    """
+    Xóa lớp học 
+
+    Input: request, lop_id
+
+    Ghi chú: chỉ có quản trị viên mới có quyền xóa lớp học
+
+    Trả về: Danh sách các lớp học sau khi xóa
+    """
     lop_hoc = get_object_or_404(LopHoc, id = lop_id)
     nam_hoc = lop_hoc.nam_hoc.nam
     if request.method == 'POST':
@@ -420,6 +501,13 @@ def xoa_lop_hoc(request, lop_id):
 
 @login_required(login_url='dang-nhap')
 def mon_hoc(request):
+    """
+    Danh sách môn học   
+
+    Input: request
+
+    Trả về: chuyển hướng tới trang danh sách môn học gồm các thông tin của môn học đó
+    """
     nam_hoc_options = NamHoc.objects.all()
     selected_nam_hoc = request.GET.get('nam_hoc', None)
     if selected_nam_hoc:
@@ -436,6 +524,15 @@ def mon_hoc(request):
 
 @login_required(login_url='dang-nhap')
 def them_mon_hoc(request):
+    """
+    Thêm môn học
+
+    Input: request
+
+    Ghi chú: chỉ có quản trị viên mới có quyền thêm môn học
+
+    Trả về: Danh sách các môn học sau khi thêm
+    """
     if request.method == 'POST':
         form = MonHocForm(request.POST)
         if form.is_valid():
@@ -447,8 +544,43 @@ def them_mon_hoc(request):
 
     return render(request, 'school_app/them_mon_hoc.html', {'form': form})
 
-@login_required(login_url='dang-nhap')  # Đảm bảo chỉ người dùng đã đăng nhập mới có quyền xóa
+
+@login_required(login_url='dang-nhap')
+def sua_mon_hoc(request, mon_hoc_id):
+    """
+    Sửa môn học
+
+    Input: request
+
+    Ghi chú: chỉ có quản trị viên mới có quyền thêm môn học
+
+    Trả về: Danh sách các môn học sau khi thêm, form thông tin môn học
+    """
+    mon_hoc = get_object_or_404(MonHoc, id=mon_hoc_id)
+    print(mon_hoc)
+    if request.method == 'POST':
+        form = MonHocForm(request.POST, instance=mon_hoc)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Sửa môn học thành công!", extra_tags='upd_subj')
+            return redirect('mon-hoc')  
+    else:
+        # Truyền instance để hiển thị thông tin hiện tại của môn học
+        form = MonHocForm(instance=mon_hoc_id)
+    print(form)
+    return render(request, 'school_app/sua_mon_hoc.html', {'form': form})
+
+@login_required(login_url='dang-nhap')  
 def xoa_mon_hoc(request, mon_hoc_id):
+    """
+    Xóa môn học
+
+    Input: request, mon_hoc_id
+
+    Ghi chú: chỉ có quản trị viên mới có quyền xóa môn học
+
+    Trả về: Danh sách các môn học sau khi xóa
+    """
     mon_hoc = get_object_or_404(MonHoc, id=mon_hoc_id)
     nam_hoc = mon_hoc.nam_hoc.nam
     if request.method == 'POST':
@@ -460,57 +592,49 @@ def xoa_mon_hoc(request, mon_hoc_id):
     return redirect(f'/mon-hoc?nam_hoc={nam_hoc}')  
 
 
-from django.core.paginator import Paginator
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-
 @login_required(login_url='dang-nhap')
 def diem(request):
-    # Lấy các tham số từ request.GET để lọc
+    """
+    Danh sách điểm: trang danh sách điểm của từng học sinh, có thể lọc theo năm học, môn học, học kỳ, hoặc tra cứu bằng tên
+
+    Input: request
+
+    Trả về: Danh sách điểm của học sinh
+    """
     selected_nam_hoc = request.GET.get('nam_hoc', '')
     selected_lop_hoc = request.GET.get('lop_hoc', '')
     selected_mon_hoc = request.GET.get('mon_hoc', '')
     selected_hoc_ki = request.GET.get('hoc_ki', '')
-    search_name = request.GET.get('search_name', '')  # Lấy tên học sinh từ tham số tìm kiếm
-
-    # Lấy danh sách tất cả các kết quả
+    search_name = request.GET.get('search_name', '')  
     ket_qua_list = KetQua.objects.all()
 
-    # Lọc theo năm học từ lớp học
     if selected_nam_hoc:
         ket_qua_list = ket_qua_list.filter(nam_hoc__nam=selected_nam_hoc)
 
-    # Lọc theo lớp học
     if selected_lop_hoc:
         ket_qua_list = ket_qua_list.filter(hoc_sinh__lop_hoc__ma_lop=selected_lop_hoc)
 
-    # Lọc theo môn học
     if selected_mon_hoc:
         ket_qua_list = ket_qua_list.filter(mon_hoc__ten_mon=selected_mon_hoc)
 
-    # Lọc theo học kỳ
     if selected_hoc_ki:
         ket_qua_list = ket_qua_list.filter(hoc_ki=selected_hoc_ki)
 
-    # Lọc theo tên học sinh nếu có tham số tìm kiếm
     if search_name:
         ket_qua_list = ket_qua_list.filter(hoc_sinh__nguoi_dung__ho_ten__icontains=search_name)
 
-    # Sắp xếp theo tên học sinh (hoặc trường tương tự trong mô hình HocSinh)
-    ket_qua_list = ket_qua_list.order_by('hoc_sinh__nguoi_dung__ho_ten')  # Sắp xếp theo trường ho_ten của học sinh
+    ket_qua_list = ket_qua_list.order_by('hoc_sinh__nguoi_dung__ho_ten')  
 
-    # Phân trang - hiển thị 10 kết quả trên mỗi trang
     paginator = Paginator(ket_qua_list, 10)
-    page_number = request.GET.get('page')  # Lấy số trang từ URL (nếu có)
-    page_obj = paginator.get_page(page_number)  # Lấy trang dữ liệu
+    page_number = request.GET.get('page')  
+    page_obj = paginator.get_page(page_number)  
 
-    # Lấy tất cả các dữ liệu cần thiết cho dropdown
     nam_hoc_list = NamHoc.objects.all()
     lop_hoc_list = LopHoc.objects.filter(nam_hoc__nam=selected_nam_hoc)
     mon_hoc_list = MonHoc.objects.all()
 
     context = {
-        'ket_qua_list': page_obj,  # Truyền dữ liệu phân trang vào context
+        'ket_qua_list': page_obj,  
         'nam_hoc_list': nam_hoc_list,
         'lop_hoc_list': lop_hoc_list,
         'mon_hoc_list': mon_hoc_list,
@@ -518,7 +642,7 @@ def diem(request):
         'selected_lop_hoc': selected_lop_hoc,
         'selected_mon_hoc': selected_mon_hoc,
         'selected_hoc_ki': selected_hoc_ki,
-        'search_name': search_name,  # Truyền giá trị tìm kiếm lại cho form
+        'search_name': search_name,  
     }
 
     return render(request, 'school_app/diem.html', context)
@@ -527,39 +651,29 @@ def diem(request):
 import openpyxl
 from django.http import HttpResponse, HttpResponseForbidden
 def xuat_diem(request):
-    # Lấy thông tin năm học, lớp học, học kỳ và môn học từ request
-    nam_hoc = request.GET.get('nam_hoc', '2024-2025')  # Ví dụ lấy năm học từ GET request
-    ma_lop = request.GET.get('lop_hoc')  # Mã lớp học (có thể lấy từ GET request)
-    hoc_ki = request.GET.get('hoc_ki')  # Học kỳ (có thể lấy từ GET request, '1' hoặc '2')
-    mon_hoc = request.GET.get('mon_hoc')  # Mã môn học (có thể lấy từ GET request)
+    """
+        Xuất điểm học sinh theo năm học, môn học, học kỳ
 
-    # Lấy lớp học theo mã lớp
+        Input: request
+
+        Trả về: file excel chứa danh sách điểm của học sinh
+    """
+    nam_hoc = request.GET.get('nam_hoc', '2024-2025')  
+    ma_lop = request.GET.get('lop_hoc')  
+    hoc_ki = request.GET.get('hoc_ki')  
+    mon_hoc = request.GET.get('mon_hoc')  
     lop_hoc = LopHoc.objects.filter(ma_lop=ma_lop).first()
-
-    # Kiểm tra nếu lop_hoc không tồn tại
     if lop_hoc is None:
         return HttpResponse("Lớp học không tồn tại", status=404)
-
-    # Lấy tất cả học sinh thuộc lớp học này
     hocsinh_list = HocSinh.objects.filter(lop_hoc=lop_hoc)
-
-    # Lọc kết quả theo học kỳ và môn học nếu có tham số hoc_ki và mon_hoc
     ket_qua_list = KetQua.objects.filter(hoc_sinh__in=hocsinh_list, nam_hoc=lop_hoc.nam_hoc)
-    
-    # Lọc theo học kỳ nếu có
     if hoc_ki:
         ket_qua_list = ket_qua_list.filter(hoc_ki=hoc_ki)
-
-    # Lọc theo môn học nếu có
     if mon_hoc:
         ket_qua_list = ket_qua_list.filter(mon_hoc__ten_mon=mon_hoc)
-
-    # Tạo workbook và worksheet mới
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = f"Bảng điểm {lop_hoc}"
-
-    # Đặt tiêu đề cho các cột
     ws.append([
         "Tên Học Sinh",
         "Học Kỳ",
@@ -569,8 +683,6 @@ def xuat_diem(request):
         "Điểm Cuối Kỳ",
         "Điểm Tổng"
     ])
-
-    # Thêm dữ liệu điểm của từng học sinh vào bảng Excel
     for ket_qua in ket_qua_list:
         ws.append([
             ket_qua.hoc_sinh.nguoi_dung.ho_ten,
@@ -582,11 +694,9 @@ def xuat_diem(request):
             ket_qua.diem_tong
         ])
 
-    # Tạo response với MIME type của Excel
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename=Bang_diem_{lop_hoc.ma_lop}_{nam_hoc}.xlsx'
 
-    # Ghi dữ liệu vào file Excel và trả về phản hồi
     wb.save(response)
     return response
 
@@ -596,84 +706,102 @@ def xuat_diem(request):
 
 @login_required(login_url='dang-nhap')
 def cap_nhat_diem(request, diem_id):
+    """
+    Cập nhật điểm
+
+    Input: request, diem_id
+
+    Ghi chú: chỉ có quản trị viên hoặc giáo viên dạy đúng bộ môn đó và lớp đó mới có quyền sửa điểm
+
+    Trả về: Thông báo cập nhật điểm thành công, danh sách điểm sau khi cập nhật
+    """
     ket_qua = get_object_or_404(KetQua, id=diem_id)
-    lop_hoc = ket_qua.hoc_sinh.lop_hoc.first()
-    if lop_hoc:
-        ma_lop = lop_hoc.ma_lop
-    nam_hoc = ket_qua.nam_hoc.nam
-    mon_hoc = ket_qua.mon_hoc.ten_mon   
-    hoc_ki = ket_qua.hoc_ki
 
     if request.method == 'POST':
-        # Xử lý form chỉnh sửa điểm
         form = KetQuaForm(request.POST, instance=ket_qua)
         if form.is_valid():
-            form.save()  # Lưu lại điểm đã chỉnh sửa
-            # Thêm thông báo thành công
+            form.save()  
             messages.success(request, 'Cập nhật điểm thành công!')
             return redirect(request.META.get('HTTP_REFERER'))  # Redirect lại trang danh sách điểm
     else:
-        form = KetQuaForm(instance=ket_qua)  # Hiển thị form với dữ liệu hiện tại
+        form = KetQuaForm(instance=ket_qua) 
 
     return render(request, 'school_app/cap_nhat_diem.html', {'form': form, 'ket_qua': ket_qua})
 
 
 @login_required(login_url='dang-nhap')
 def danh_sach_giao_vien(request):
+    """
+    Danh sách giáo viên
+
+    Input: request
+
+    Ghi chú: chỉ có quản trị viên mới có quyền xem danh sách giáo viên
+
+    Trả về: Chuyển hướng tới trang danh sách giáo viên
+    """
     giao_vien_list = GiaoVien.objects.all()
+    giao_vien_list = sorted(giao_vien_list, key=lambda gv: gv.nguoi_dung.ho_ten.split()[-1].lower())
     return render(request, 'school_app/ds_giao_vien.html', {'giao_vien_list': giao_vien_list})
 
-# Thêm giáo viên
+
 @login_required(login_url='dang-nhap')
 def them_giao_vien(request):
+    """
+    Thêm giáo viên
+
+    Input: request, thông tin của giáo viên cần thêm: username, ho_ten, email,...
+
+    Ghi chú: chỉ có quản trị viên mới có quyền thêm giáo viên
+
+    Trả về: 
+        - form thông tin giáo viên
+        - Nếu thêm giáo viên thành công, thông báo thêm giáo viên thành công
+        - Nếu thêm giáo viên thất bại, thông báo thêm giáo viên thất bại
+    """
     form = GiaoVienForm(request.POST or None)
     context = {
         'form': form,
     }
-    storage = get_messages(request)  # Lấy thông báo đã lưu
-    for message in storage:  # Tiêu thụ thông báo (không bắt buộc)
+    storage = get_messages(request)  
+    for message in storage:  
         print(f"Message: {message}")
     
     if request.method == 'POST':
         if form.is_valid():
-            # Lấy dữ liệu từ form
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             ho_ten = form.cleaned_data.get('ho_ten')
             ngay_sinh = form.cleaned_data.get('ngay_sinh')
             gioi_tinh = form.cleaned_data.get('gioi_tinh')
             email = form.cleaned_data.get('email')
+            so_dien_thoai = form.cleaned_data.get('so_dien_thoai')
             dia_chi = form.cleaned_data.get('dia_chi')
-            mon_day = form.cleaned_data.get('mon_day')  # Lấy môn dạy từ form
+            mon_day = form.cleaned_data.get('mon_day')  
 
-            # Kiểm tra xem username hoặc email đã tồn tại chưa
             if NguoiDung.objects.filter(username=username).exists():
                 messages.error(request, "Tên đăng nhập đã được sử dụng.", extra_tags='add_teacher')
             elif NguoiDung.objects.filter(email=email).exists():
                 messages.error(request, "Email đã được sử dụng.", extra_tags='add_teacher')
             else:
                 try:
-                    # Tạo người dùng (User)
                     user = NguoiDung.objects._create_user(
                         username=username, 
                         password=password, 
                         ho_ten=ho_ten,
-                        vai_tro='2',  # Vai trò giáo viên
+                        vai_tro='2',  
                         ngay_sinh=ngay_sinh,
                         gioi_tinh=gioi_tinh,
                         email=email,
+                        so_dien_thoai=so_dien_thoai,
                         dia_chi=dia_chi,
                     )
                     
-                    # Tạo đối tượng GiaoVien và liên kết với người dùng
-                    giao_vien = GiaoVien(nguoi_dung=user, mon_day=mon_day)  # Gắn môn dạy vào giáo viên
-                    user.save()  # Lưu người dùng
-                    giao_vien.save()  # Lưu giáo viên
-
-                    # Thêm thông báo thành công
+                    giao_vien = GiaoVien(nguoi_dung=user, mon_day=mon_day)  
+                    user.save()  
+                    giao_vien.save()  
                     messages.success(request, "Thêm giáo viên thành công", extra_tags='add_teacher')
                 except Exception as e:
-                    # Xử lý lỗi và ghi log
                     logger.error(f"Lỗi khi thêm giáo viên: {e}")
                     messages.error(request, "Không thể thêm giáo viên", extra_tags='add_teacher')
         else:
@@ -682,27 +810,45 @@ def them_giao_vien(request):
     return render(request, 'school_app/them_giao_vien.html', context=context)
 
 
-# Sửa thông tin giáo viên
 @login_required(login_url='dang-nhap')
 def cap_nhat_giao_vien(request, giao_vien_id):
+    """
+    Cập nhật giáo viên
+
+    Input: request, giao_vien_id, thông tin của giáo viên cần cập nhật: username, ho_ten, email,...
+
+    Ghi chú: chỉ có quản trị viên mới có quyền cập nhật giáo viên
+
+    Trả về: 
+        - form thông tin giáo viên
+        - Nếu cập nhật giáo viên thành công, thông báo thêm giáo viên thành công
+    """
     giao_vien = get_object_or_404(GiaoVien, id=giao_vien_id)
-    nguoi_dung = giao_vien.nguoi_dung  # Lấy đối tượng NguoiDung liên kết với GiaoVien
+    nguoi_dung = giao_vien.nguoi_dung  
 
     if request.method == 'POST':
-        form = CapNhatNguoiDungForm(request.POST, instance=nguoi_dung)  # Khởi tạo form với instance của NguoiDung
+        form = CapNhatNguoiDungForm(request.POST, instance=nguoi_dung)  
         if form.is_valid():
-            # Lưu các thay đổi cho NguoiDung
             nguoi_dung = form.save()
             messages.success(request, 'Cập nhật giáo viên thành công!')
-            return redirect('ds-giao-vien')  # Chuyển hướng đến danh sách giáo viên
+            return redirect('ds-giao-vien')  
     else:
-        form = CapNhatNguoiDungForm(instance=nguoi_dung)  # Khởi tạo form với instance của NguoiDung
+        form = CapNhatNguoiDungForm(instance=nguoi_dung)  
 
     return render(request, 'school_app/cap_nhat_gv.html', {'form': form, 'giao_vien': giao_vien})
 
 # Xóa giáo viên
 @login_required(login_url='dang-nhap')
 def xoa_giao_vien(request, giao_vien_id):
+    """
+    Xóa giáo viên
+
+    Input: request, giao_vien_id
+
+    Ghi chú: chỉ có quản trị viên mới có quyền xóa giáo viên
+
+    Trả về: Thông báo xóa giáo viên thành công và trả về danh sách giáo viên sau khi xóa
+    """
     giao_vien = get_object_or_404(GiaoVien, id=giao_vien_id)
     nguoi_dung = giao_vien.nguoi_dung
     if request.method == 'POST':
@@ -711,68 +857,28 @@ def xoa_giao_vien(request, giao_vien_id):
         return redirect('ds-giao-vien')
     return render(request, 'school_app/xoa_giao_vien.html', {'giao_vien': giao_vien})
 
-# # Phân công giáo viên dạy lớp
-# @login_required(login_url='dang-nhap')
-# def phan_cong_giao_vien(request, giao_vien_id):
-#     giao_vien = GiaoVien.objects.get(id=giao_vien_id)
 
-#     # Lấy danh sách môn học và năm học
-#     mon_hoc_list = MonHoc.objects.all()
-#     nam_hoc_list = NamHoc.objects.all()
-
-#     # Lọc lớp học theo năm học nếu có
-#     current_nam_hoc = request.GET.get('nam_hoc')  # Lấy năm học từ query parameters
-#     lop_hoc_list = LopHoc.objects.exclude(id__in=giao_vien.lop_day.values('id'))
-    
-#     # Lọc lớp học đã có giáo viên khác dạy môn học
-#     if giao_vien.mon_day:
-#         lop_hoc_list = lop_hoc_list.exclude(
-#             id__in=LopHoc.objects.filter(
-#                 giaovien__mon_day=giao_vien.mon_day  # Sử dụng 'giaovien' thay vì 'giao_vien'
-#             ).values('id')
-#         )
-
-#     if current_nam_hoc:  # Nếu có chọn năm học
-#         try:
-#             nam_hoc_obj = NamHoc.objects.get(nam=current_nam_hoc)
-#             lop_hoc_list = lop_hoc_list.filter(nam_hoc=nam_hoc_obj)
-#         except NamHoc.DoesNotExist:
-#             lop_hoc_list = []  # Nếu không tìm thấy năm học, trả về danh sách rỗng
-
-#     # Xử lý POST request
-#     if request.method == 'POST':
-#         selected_lop_hoc = request.POST.getlist('lop_hoc')  # Lớp học được chọn
-#         # Lưu thông tin
-#         giao_vien.lop_day.set(LopHoc.objects.filter(id__in=selected_lop_hoc))
-#         giao_vien.save()
-
-#         # Thông báo thành công
-#         messages.success(request, 'Phân công giáo viên thành công!')
-#         return redirect('ds-giao-vien')
-
-#     return render(request, 'school_app/phan_cong_gv.html', {
-#         'giao_vien': giao_vien,
-#         'lop_hoc_list': lop_hoc_list,
-#         'mon_hoc_list': mon_hoc_list,
-#         'nam_hoc_list': nam_hoc_list,
-#         'current_nam_hoc': current_nam_hoc,  # Gửi năm học hiện tại
-#     })
-
+# Phân công giáo viên dạy
 @login_required(login_url='dang-nhap')
 def phan_cong_giao_vien(request, giao_vien_id):
+    """
+    Phân công giáo viên dạy 
+
+    Input: request, giao_vien_id
+
+    Ghi chú: chỉ có quản trị viên mới có quyền phân công giáo viên
+
+    Trả về: 
+        - Danh sách lớp học năm học đó chưa được phân công dạy môn đó
+        - Danh sách lớp học đã được phân công và tên giáo viên đã được phân công
+        - Nếu phân công giáo viên thành công thì trả về trang phân công cho giáo viên đó
+    """
     giao_vien = GiaoVien.objects.get(id=giao_vien_id)
     mon_hoc = giao_vien.mon_day
-    # Lấy danh sách môn học và năm học
     mon_hoc_list = MonHoc.objects.all()
     nam_hoc_list = NamHoc.objects.all()
-
-    # Lấy năm học từ query parameters
     current_nam_hoc = request.GET.get('nam_hoc')
-
-    # Danh sách lớp học
     lop_hoc_list = LopHoc.objects.exclude(id__in=giao_vien.lop_day.values('id'))
-
-    # Lọc lớp học theo năm học
     if current_nam_hoc:
         try:
             nam_hoc_obj = NamHoc.objects.get(nam=current_nam_hoc)
@@ -780,26 +886,22 @@ def phan_cong_giao_vien(request, giao_vien_id):
         except NamHoc.DoesNotExist:
             lop_hoc_list = []
 
-    # Lớp đã phân công cho giáo viên khác cùng môn
     lop_da_phan_cong_giao_vien_khac = []
     if giao_vien.mon_day:
         lop_da_phan_cong_giao_vien_khac = lop_hoc_list.filter(
             giaovien__mon_day=giao_vien.mon_day
         ).distinct()
 
-        # Lọc bỏ các lớp này ra khỏi danh sách lớp học có thể phân công
         lop_hoc_list = lop_hoc_list.exclude(id__in=lop_da_phan_cong_giao_vien_khac.values('id'))
 
-    # Lớp đã phân công cho giáo viên hiện tại
     lop_da_phan_cong_giao_vien_hien_tai = giao_vien.lop_day.all()
     if current_nam_hoc:
         lop_da_phan_cong_giao_vien_hien_tai = lop_da_phan_cong_giao_vien_hien_tai.filter(nam_hoc__nam=current_nam_hoc)
 
-    # Xử lý POST request
     if request.method == 'POST':
-        selected_lop_hoc = request.POST.getlist('lop_hoc')  # Lấy danh sách lớp học từ form
+        selected_lop_hoc = request.POST.getlist('lop_hoc')  
         if selected_lop_hoc:
-            giao_vien.lop_day.add(*LopHoc.objects.filter(id__in=selected_lop_hoc))  # Thêm các lớp vào danh sách phân công
+            giao_vien.lop_day.add(*LopHoc.objects.filter(id__in=selected_lop_hoc))  
             messages.success(request, 'Thêm lớp học vào phân công thành công!')
         else:
             messages.warning(request, 'Bạn chưa chọn lớp học nào để phân công.')
@@ -817,34 +919,49 @@ def phan_cong_giao_vien(request, giao_vien_id):
         'mon_hoc': mon_hoc
     })
 
+
+# Hủy phân công giáo viên dạy
 @login_required(login_url='dang-nhap')
 def huy_phan_cong(request, giao_vien_id, lop_hoc_id):
-    # Lấy đối tượng giáo viên và lớp học từ database
+    """
+    Cập nhật giáo viên
+
+    Input: request, giao_vien_id, lop_hoc_id
+
+    Ghi chú: chỉ có quản trị viên mới có quyền hủy phân công giáo viên dạy
+
+    Trả về: 
+        - Danh sách lớp học năm học đó chưa được phân công dạy môn đó
+        - Danh sách lớp học đã được phân công và tên giáo viên đã được phân công
+        - Danh sách lớp học giáo viên đó đã được phân công sau khi hủy
+    """
     giao_vien = get_object_or_404(GiaoVien, id=giao_vien_id)
     lop_hoc = get_object_or_404(LopHoc, id=lop_hoc_id)
 
-    # Xóa lớp học khỏi danh sách lớp mà giáo viên dạy
     giao_vien.lop_day.remove(lop_hoc)
     
-    # Hiển thị thông báo thành công
     messages.success(request, f'Đã hủy phân công lớp {lop_hoc.ma_lop} cho giáo viên {giao_vien.nguoi_dung.ho_ten}.')
 
-    # Chuyển hướng trở lại trang phân công giáo viên
     return redirect('phan-cong-gv', giao_vien_id=giao_vien.id)
 
 
 
 @login_required(login_url='dang-nhap')
 def tong_ket(request):
-    # Lấy danh sách các năm học và môn học
+    """
+    Trang tổng kết: trang thể hiện những kết quả của từng năm học, 
+    bao gồm biểu đồ so sánh điểm trung bình tổng các lớp cả năm hoặc theo từng môn
+
+    Input: request
+
+    Trả về: Trang tổng kết, cùng các dữ liệu lable và data_point để vẽ biểu đồ
+    """
     nam_hocs = NamHoc.objects.all()
     mon_hocs = MonHoc.objects.all()
 
-    # Lấy năm học và môn học từ yêu cầu GET
     nam_hoc_id = request.GET.get('nam_hoc_id')
     mon_hoc_id = request.GET.get('mon_hoc_id')
 
-    # Nếu không chọn năm học, không hiển thị gì
     if not nam_hoc_id:
         return render(request, 'school_app/tong_ket.html', {
             'nam_hocs': nam_hocs,
@@ -856,13 +973,10 @@ def tong_ket(request):
             'selected_mon_hoc': None,
         })
 
-    # Lọc lớp học theo năm học được chọn
     lop_hocs = LopHoc.objects.filter(nam_hoc_id=nam_hoc_id)
 
-    # Chuẩn bị dữ liệu điểm trung bình cho từng lớp theo môn học
     lop_data = []
     for lop in lop_hocs:
-        # Tính điểm trung bình của lớp theo môn học nếu được chọn
         if mon_hoc_id:
             diem_tb = KetQuaMonHoc.objects.filter(
                 hoc_sinh__lop_hoc=lop,
@@ -870,22 +984,18 @@ def tong_ket(request):
                 mon_hoc_id=mon_hoc_id
             ).aggregate(Avg('diem_tong_ket'))['diem_tong_ket__avg']
         else:
-            # Tính điểm trung bình tổng hợp (không phân biệt môn)
             diem_tb = KetQuaMonHoc.objects.filter(
                 hoc_sinh__lop_hoc=lop,
                 nam_hoc_id=nam_hoc_id
             ).aggregate(Avg('diem_tong_ket'))['diem_tong_ket__avg']
 
-        # Thêm vào danh sách dữ liệu lớp
         lop_data.append({
             'ma_lop': lop.ma_lop,
             'diem_tb': round(diem_tb, 2) if diem_tb else 0
         })
 
-    # Sắp xếp danh sách lớp theo mã lớp
     lop_data = sorted(lop_data, key=lambda x: x['ma_lop'])
 
-    # Tách labels (tên lớp) và data points (điểm trung bình)
     labels = [lop['ma_lop'] for lop in lop_data]
     data_points = [lop['diem_tb'] for lop in lop_data]
 
@@ -893,8 +1003,8 @@ def tong_ket(request):
         'nam_hocs': nam_hocs,
         'mon_hocs': mon_hocs,
         'lop_data': lop_data,
-        'labels': labels,  # Truyền labels cho template
-        'data_points': data_points,  # Truyền data points cho template
+        'labels': labels,  
+        'data_points': data_points,  
         'selected_nam_hoc': int(nam_hoc_id) if nam_hoc_id else None,
         'selected_mon_hoc': int(mon_hoc_id) if mon_hoc_id else None,
     }
@@ -903,35 +1013,43 @@ def tong_ket(request):
 
 
 
+@login_required(login_url='dang-nhap')
 def danh_sach_kq_hoc_sinh(request, nam_hoc_id, status):
-    # Lọc danh sách kết quả học sinh dựa trên năm học
+    """
+        Trang danh sách kết quả học sinh
+
+        Input: request, nam_hoc_id, status
+
+        Trả về: Danh sách học sinh theo học lực
+    """
     ket_qua = KetQuaNamHoc.objects.filter(nam_hoc_id=nam_hoc_id)
-    
-    # Phân loại học sinh dựa trên trạng thái
+    print(ket_qua)
     if status == 'gioi':
-        ket_qua = ket_qua.filter(diem_tong_ket__gt=8, hanh_kiem='Tot')  # Điểm tổng kết > 8 và hạnh kiểm tốt
+        ket_qua = ket_qua.filter(diem_tong_ket__gte=8.0, hanh_kiem='Tot')  
+
     elif status == 'kha':
         ket_qua = ket_qua.filter(
-            diem_tong_ket__gt=7, diem_tong_ket__lte=8, hanh_kiem__in=['Tot', 'Kha']  # 7 < Điểm tổng kết <= 8 và hạnh kiểm từ khá trở lên
+            diem_tong_ket__gte=7.0, diem_tong_ket__lt=8.0, hanh_kiem__in=['Tot', 'Kha']
         )
+
     elif status == 'trung_binh':
         ket_qua = ket_qua.filter(
-            diem_tong_ket__gte=5, diem_tong_ket__lte=7, hanh_kiem__in=['Tot', 'Kha']  # 5 <= Điểm tổng kết <= 7 và hạnh kiểm từ khá trở lên
+            diem_tong_ket__gte=5.0, diem_tong_ket__lt=7.0, hanh_kiem__in=['Tot', 'Kha']
         )
-    elif status == 'khong_dat':
-        ket_qua = ket_qua.filter(diem_tong_ket__lt=5, hanh_kiem='Yeu')  # Điểm tổng kết < 5 và hạnh kiểm yếu
-    else:
-        ket_qua = []
 
-    # Lấy danh sách kết quả bao gồm: mã lớp, năm học và điểm tổng kết
+    elif status == 'khong_dat':
+        ket_qua = ket_qua.filter(
+            Q(diem_tong_ket__lt=5.0) | Q(hanh_kiem='Yeu')
+        )
+
+    else:
+        ket_qua = KetQuaNamHoc.objects.none()
+        
     hoc_sinh_list = []
     for kq in ket_qua:
         hoc_sinh = kq.hoc_sinh
-
-        # Tìm lớp học tương ứng với năm học đó
         lop_hoc = hoc_sinh.lop_hoc.filter(nam_hoc_id=nam_hoc_id).first()
         ma_lop = lop_hoc.ma_lop if lop_hoc else None
-
         hoc_sinh_list.append({
             'ho_ten': hoc_sinh.nguoi_dung.ho_ten,
             'ma_lop': ma_lop,
@@ -952,13 +1070,18 @@ def danh_sach_kq_hoc_sinh(request, nam_hoc_id, status):
 
 @login_required(login_url='dang-nhap')
 def ket_qua_hoc_tap(request):
-    # Lấy học sinh hiện tại
+    """
+        Kết quả học sinh 
+
+        Input: request
+
+        Trả về: Chuyển hướng tới trang kết quả học sinh được lọc theo năm học, học kỳ
+    """
     try:
         hoc_sinh = HocSinh.objects.get(nguoi_dung=request.user)
     except HocSinh.DoesNotExist:
         return render(request, 'school_app/404.html', {'message': 'Học sinh không tồn tại'})
 
-    # Lấy năm học và học kỳ đã chọn từ GET
     selected_nam_hoc = request.GET.get('nam_hoc', None)
     selected_hoc_ki = request.GET.get('hoc_ki', None)
 
@@ -969,33 +1092,28 @@ def ket_qua_hoc_tap(request):
             nam_hoc = None
     else:
         nam_hoc = None
-
-    # Lấy lớp học của học sinh trong năm học đã chọn
     lop_hoc = None
-    if nam_hoc:
-        lop_hoc = hoc_sinh.lop_hoc.filter(nam_hoc=nam_hoc).first()  # Lấy lớp học đầu tiên trong năm học này
 
-    # Lấy kết quả học tập
+    if nam_hoc:
+        lop_hoc = hoc_sinh.lop_hoc.filter(nam_hoc=nam_hoc).first()  
+
     ket_qua_hoc_ky = None
     ket_qua_mon_hoc = None
     ket_qua_nam_hoc = None
 
     if nam_hoc:
-        if selected_hoc_ki:  # Nếu người dùng chọn học kỳ
-            # Kết quả học kỳ (Học kỳ 1 hoặc Học kỳ 2)
+        if selected_hoc_ki:  
             ket_qua_hoc_ky = KetQua.objects.filter(
                 hoc_sinh=hoc_sinh,
                 nam_hoc=nam_hoc,
                 hoc_ki=selected_hoc_ki
             )
         else:
-            # Kết quả môn học cả năm
             ket_qua_mon_hoc = KetQuaMonHoc.objects.filter(
                 hoc_sinh=hoc_sinh,
                 nam_hoc=nam_hoc
             )
 
-            # Kết quả tổng kết năm học
             try:
                 ket_qua_nam_hoc = KetQuaNamHoc.objects.get(
                     hoc_sinh=hoc_sinh,
@@ -1004,10 +1122,8 @@ def ket_qua_hoc_tap(request):
             except KetQuaNamHoc.DoesNotExist:
                 ket_qua_nam_hoc = None
 
-    # Danh sách tất cả các năm học
     danh_sach_nam_hoc = hoc_sinh.lop_hoc.values_list('nam_hoc__nam', flat=True).distinct()
 
-    # Tạo context để gửi dữ liệu sang template
     context = {
         'lop_hoc': lop_hoc, 
         'danh_sach_nam_hoc': danh_sach_nam_hoc,  
@@ -1026,6 +1142,15 @@ def ket_qua_hoc_tap(request):
 
 @login_required(login_url='dang-nhap')
 def quan_ly_diem(request):
+    """
+        Trang quản lý điểm dành cho giáo viên bộ môn
+
+        Input: request
+
+        Trả về: Danh sách điểm lọc theo năm học, lớp học, học kỳ
+
+        Ghi chú: Danh sách chỉ hiện điểm môn mà giáo viên đó dạy, lớp giáo viên đó dạy
+    """
     try:
         giao_vien = GiaoVien.objects.get(nguoi_dung=request.user)
     except GiaoVien.DoesNotExist:
@@ -1035,27 +1160,18 @@ def quan_ly_diem(request):
     selected_hoc_ki = request.GET.get('hoc_ki', None)
     selected_lop_hoc = request.GET.get('lop_hoc', None)
 
-    # Danh sách năm học
     nam_hoc_list = NamHoc.objects.all()
-
-    # Lọc môn học của giáo viên đang dạy
     mon_hoc_list = MonHoc.objects.filter(giaovien=giao_vien)
-
-    # Lọc các lớp học mà giáo viên đang dạy (từ trường lop_day trong GiaoVien)
     lop_hoc_list = giao_vien.lop_day.all()
-
-    # Nếu đã chọn năm học thì chỉ lọc lớp học thuộc năm học đó
+    ket_qua_list = KetQua.objects.none()
     if selected_nam_hoc:
         lop_hoc_list = lop_hoc_list.filter(nam_hoc__nam=selected_nam_hoc)
 
-    # Lọc kết quả điểm cho các môn giáo viên đang dạy và các lớp học giáo viên tham gia
-    ket_qua_list = KetQua.objects.filter(
-        mon_hoc__in=mon_hoc_list,  # Chỉ kết quả của các môn giáo viên dạy
-        hoc_sinh__lop_hoc__in=lop_hoc_list  # Chỉ kết quả của các lớp giáo viên dạy
-    )
+        ket_qua_list = KetQua.objects.filter(
+            mon_hoc__in=mon_hoc_list, 
+            hoc_sinh__lop_hoc__in=lop_hoc_list 
+        )
 
-    # Áp dụng các bộ lọc từ tham số GET
-    
     if selected_nam_hoc:
         ket_qua_list = ket_qua_list.filter(nam_hoc__nam=selected_nam_hoc)
     if selected_hoc_ki:
@@ -1063,7 +1179,6 @@ def quan_ly_diem(request):
     if selected_lop_hoc:
         ket_qua_list = ket_qua_list.filter(hoc_sinh__lop_hoc__ma_lop=selected_lop_hoc)
 
-    # Truyền context ra template
     context = {
         'nam_hoc_list': nam_hoc_list,
         'lop_hoc_list': lop_hoc_list,
@@ -1075,11 +1190,20 @@ def quan_ly_diem(request):
         'mon_hoc': giao_vien.mon_day.ten_mon
     }
 
-    return render(request, 'school_app/home_giao_vien.html', context)
+    return render(request, 'school_app/diem_giao_vien.html', context)
 
 
 @login_required(login_url='dang-nhap')
 def cap_nhat_diem_gv(request, diem_id):
+    """
+        Cập nhật điểm dành cho giáo viên bộ môn
+
+        Input: request, diem_id
+
+        Trả về: Danh sách điểm sau khi cập nhật
+
+        Ghi chú: Danh sách chỉ hiện điểm môn mà giáo viên đó dạy, lớp giáo viên đó dạy
+    """
     ket_qua = get_object_or_404(KetQua, id=diem_id)
     lop_hoc = ket_qua.hoc_sinh.lop_hoc.first()
     if lop_hoc:
@@ -1088,19 +1212,25 @@ def cap_nhat_diem_gv(request, diem_id):
     nam_hoc = ket_qua.nam_hoc.nam 
     hoc_ki = ket_qua.hoc_ki
     if request.method == 'POST':
-        # Xử lý form chỉnh sửa điểm
         form = KetQuaForm(request.POST, instance=ket_qua)
         if form.is_valid():
-            form.save()  # Lưu lại điểm đã chỉnh sửa
-            return redirect(f'/quan-ly-diem?nam_hoc={nam_hoc}&lop_hoc={ma_lop}&hoc_ki={hoc_ki}')  # Redirect lại trang danh sách điểm
+            form.save()  
+            return redirect(f'/quan-ly-diem?nam_hoc={nam_hoc}&lop_hoc={ma_lop}&hoc_ki={hoc_ki}')  
     else:
-        form = KetQuaForm(instance=ket_qua)  # Hiển thị form với dữ liệu hiện tại
+        form = KetQuaForm(instance=ket_qua)  
 
     return render(request, 'school_app/cap_nhat_diem_gv.html', {'form': form, 'ket_qua': ket_qua})
 
 
 @login_required(login_url='dang-nhap')
 def lop_chu_nhiem(request):
+    """
+        Trang lớp chủ nhiệm hiển thị danh sách học sinh lớp mà giáo viên đó chủ nhiệm
+
+        Input: request
+
+        Trả về: Danh sách các lớp mà giáo viên đó chủ nhiệm qua các năm
+    """
     giao_vien = get_object_or_404(GiaoVien, nguoi_dung=request.user)
 
     nam_hoc_list = NamHoc.objects.all()
@@ -1126,3 +1256,53 @@ def lop_chu_nhiem(request):
         'hoc_sinh_list': hoc_sinh_list,
         'lop': lop_chu_nhiem.first() if lop_chu_nhiem.exists() else None
     })
+
+@login_required(login_url='dang-nhap')
+def xem_ket_qua_lop(request, lop_id):
+    """
+        Xem kết quả học tập của lớp mà giáo viên đó chủ nhiệm
+
+        Input: request, lop_id
+
+        Trả về: Danh sách điểm của các học sinh lọc theo từng môn
+    """
+    # Lấy tham số lọc từ query string (mặc định để trống)
+    hoc_ky = request.GET.get('hoc_ky', '1')  # Học kỳ mặc định là '1'
+    mon_hoc_id = request.GET.get('mon_hoc', None)  # Mặc định không chọn môn học
+
+    # Truy xuất thông tin lớp học
+    lop_hoc = LopHoc.objects.get(id=lop_id)
+    hoc_sinh_list = HocSinh.objects.filter(lop_hoc=lop_hoc)
+
+    # Truy xuất danh sách môn học và năm học
+    danh_sach_mon_hoc = MonHoc.objects.all()
+    nam_hoc = lop_hoc.nam_hoc
+
+    # Kết quả lớp học
+    ket_qua_lop = []
+    if mon_hoc_id:  # Chỉ lọc khi có chọn môn học
+        mon_hoc = MonHoc.objects.get(id=mon_hoc_id)
+        for hoc_sinh in hoc_sinh_list:
+            ket_qua = KetQua.objects.filter(
+                hoc_sinh=hoc_sinh, 
+                nam_hoc=nam_hoc, 
+                hoc_ki=hoc_ky,
+                mon_hoc=mon_hoc
+            ).first()
+            ket_qua_lop.append({
+                'ho_ten': hoc_sinh.nguoi_dung.ho_ten,
+                'diem_15phut': ket_qua.diem_15phut if ket_qua else None,
+                'diem_1tiet': ket_qua.diem_1tiet if ket_qua else None,
+                'diem_gk': ket_qua.diem_gk if ket_qua else None,
+                'diem_ck': ket_qua.diem_ck if ket_qua else None,
+                'diem_tong': ket_qua.diem_tong if ket_qua else None,
+            })
+
+    context = {
+        'lop_hoc': lop_hoc,
+        'ket_qua_lop': ket_qua_lop,
+        'hoc_ky': hoc_ky,
+        'danh_sach_mon_hoc': danh_sach_mon_hoc,
+        'mon_hoc_id': int(mon_hoc_id) if mon_hoc_id else None,
+    }
+    return render(request, 'school_app/ket_qua_lop.html', context)

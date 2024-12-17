@@ -36,6 +36,12 @@
             <th>Email</th>
             <td>{{ user.email }}</td>
         </tr>
+        {%if user.so_dien_thoai%}
+        <tr>
+            <th>Số điện thoại</th>
+            <td>{{ user.so_dien_thoai }}</td>
+        </tr>
+        {%endif %}
         <tr>
             <th>Địa chỉ</th>
             <td>{{ user.dia_chi }}</td>
