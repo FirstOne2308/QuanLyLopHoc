@@ -1,90 +1,94 @@
 {% extends 'school_app/base.html' %}
 
 {% block content %}
-<h1>Kết quả học tập</h1>
+<div class="ds-container">
+    <h2 style="font-weight: 600; color: #2c3e50;">Kết quả học tập</h1>
+    <!-- Form lọc học kỳ và năm học -->
+    <form method="GET" class="filter-form">
+        <div class="filter-choice" style="align-items: flex-end;">
+            <div class="filter-item">
+                <label for="nam_hoc">Năm học:</label>
+                <select name="nam_hoc" id="nam_hoc">
+                    <option value="">Chọn năm học</option>
+                    {% for nam in danh_sach_nam_hoc %}
+                    <option value="{{ nam }}" {% if selected_nam_hoc == nam %}selected{% endif %}>{{ nam }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-
-
-<!-- Form lọc học kỳ và năm học -->
-<form method="GET">
-    <label for="nam_hoc">Năm học:</label>
-    <select name="nam_hoc" id="nam_hoc">
-        <option value="">Chọn năm học</option>
-        {% for nam in danh_sach_nam_hoc %}
-        <option value="{{ nam }}" {% if selected_nam_hoc == nam %}selected{% endif %}>{{ nam }}</option>
-        {% endfor %}
-    </select>
-
-    <label for="hoc_ki">Học kỳ:</label>
-    <select name="hoc_ki" id="hoc_ki">
-        <option value="">Cả năm</option>
-        <option value="1" {% if selected_hoc_ki == "1" %}selected{% endif %}>Học kỳ 1</option>
-        <option value="2" {% if selected_hoc_ki == "2" %}selected{% endif %}>Học kỳ 2</option>
-    </select>
-
-    <button type="submit">Lọc</button>
-</form>
-
-<hr>
-
-<div class="student-info">
-    <p><strong>Họ và tên:</strong> {{ user.ho_ten }}</p>
-    <p><strong>Lớp:</strong> {{ lop_hoc.ma_lop }}</p>
-    <p><strong>Năm học:</strong> {{ selected_nam_hoc|default:"Tất cả" }}</p>
+            <div class="filter-item">
+                <label for="hoc_ki">Học kỳ:</label>
+                <select name="hoc_ki" id="hoc_ki">
+                    <option value="">Cả năm</option>
+                    <option value="1" {% if selected_hoc_ki == "1" %}selected{% endif %}>Học kỳ 1</option>
+                    <option value="2" {% if selected_hoc_ki == "2" %}selected{% endif %}>Học kỳ 2</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-search">Lọc</button>
+        </div>
+    </form>
+    
+    <hr>
+    
+    <div class="student-info">
+        <p style="font-size: 17px;"><strong>Họ và tên:</strong> {{ user.ho_ten }}</p>
+        <p style="font-size: 17px;"><strong>Lớp:</strong> {{ lop_hoc.ma_lop }}</p>
+        <p style="font-size: 17px;"><strong>Năm học:</strong> {{ selected_nam_hoc|default:"Tất cả" }}</p>
+    </div>
+    
+    
+    <!-- Hiển thị kết quả -->
+    {% if ket_qua_hoc_ky %}
+    <h3 style="font-weight: 550; color: #2c3e50;">Kết quả học kỳ {{ selected_hoc_ki }}</h2>
+    <table class="table-list">
+        <thead>
+            <tr>
+                <th>Môn học</th>
+                <th>Điểm 15 phút</th>
+                <th>Điểm 1 tiết</th>
+                <th>Điểm GK</th>
+                <th>Điểm CK</th>
+                <th>Điểm tổng</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ket_qua in ket_qua_hoc_ky %}
+            <tr>
+                <td>{{ ket_qua.mon_hoc.ten_mon }}</td>
+                <td>{{ ket_qua.diem_15phut }}</td>
+                <td>{{ ket_qua.diem_1tiet }}</td>
+                <td>{{ ket_qua.diem_gk }}</td>
+                <td>{{ ket_qua.diem_ck }}</td>
+                <td>{{ ket_qua.diem_tong }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% elif ket_qua_mon_hoc %}
+    <h3 style="font-weight: 550; color: #2c3e50;">Kết quả môn học cả năm</h3 style="font-weight: 550; color: #2c3e50;">
+    <table class="table-list">
+        <thead>
+            <tr>
+                <th>Môn học</th>
+                <th>Điểm tổng kết</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ket_qua in ket_qua_mon_hoc %}
+            <tr>
+                <td>{{ ket_qua.mon_hoc.ten_mon }}</td>
+                <td>{{ ket_qua.diem_tong_ket|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <h3 style="font-weight: 550; color: #2c3e50; margin-top: 20px;">Điểm tổng kết cả năm</h3>
+    <p style="font-size: 17px;"><strong>Điểm tổng kết:</strong> {{ ket_qua_nam_hoc.diem_tong_ket|floatformat:2 }}</p>
+    <p style="font-size: 17px;"><strong>Hạnh kiểm:</strong> {{ ket_qua_nam_hoc.get_hanh_kiem_display }}</p>
+    <p style="font-size: 17px;"><strong>Kết quả:</strong> {% if ket_qua_nam_hoc.ket_qua == 'Dat' %}Được lên lớp{% else %}Không đạt{% endif %}</p>
+    {% else %}
+    <p>Không có dữ liệu.</p>
+    {% endif %}
 </div>
-
-
-<!-- Hiển thị kết quả -->
-{% if ket_qua_hoc_ky %}
-<h2>Kết quả học kỳ {{ selected_hoc_ki }}</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Môn học</th>
-            <th>Điểm 15 phút</th>
-            <th>Điểm 1 tiết</th>
-            <th>Điểm GK</th>
-            <th>Điểm CK</th>
-            <th>Điểm tổng</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for ket_qua in ket_qua_hoc_ky %}
-        <tr>
-            <td>{{ ket_qua.mon_hoc.ten_mon }}</td>
-            <td>{{ ket_qua.diem_15phut }}</td>
-            <td>{{ ket_qua.diem_1tiet }}</td>
-            <td>{{ ket_qua.diem_gk }}</td>
-            <td>{{ ket_qua.diem_ck }}</td>
-            <td>{{ ket_qua.diem_tong }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% elif ket_qua_mon_hoc %}
-<h2>Kết quả môn học cả năm</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Môn học</th>
-            <th>Điểm tổng kết</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for ket_qua in ket_qua_mon_hoc %}
-        <tr>
-            <td>{{ ket_qua.mon_hoc.ten_mon }}</td>
-            <td>{{ ket_qua.diem_tong_ket }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<h2>Điểm tổng kết cả năm</h2>
-<p>Điểm tổng kết: {{ ket_qua_nam_hoc.diem_tong_ket }}</p>
-<p>Hạnh kiểm: {{ ket_qua_nam_hoc.get_hanh_kiem_display }}</p>
-<p>Kết quả: {% if ket_qua_nam_hoc.ket_qua == 'Dat' %}Được lên lớp{% else %}Không đạt{% endif %}</p>
-{% else %}
-<p>Không có dữ liệu.</p>
-{% endif %}
 {% endblock %}

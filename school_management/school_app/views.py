@@ -31,7 +31,7 @@ def home(request):
 
         Input: request
 
-        Trả về: giao diện trang chủ 
+        Trả về: giao diện trang chủ
     """
     return render(request, 'school_app/home.html')
 
@@ -305,6 +305,17 @@ def them_lop_hoc(request):
 #Tạo danh sách lớp(Thêm học sinh vào lớp)
 @login_required(login_url='dang-nhap')
 def tao_danh_sach_lop(request):
+    """
+    Trang tạo danh sách lớp: trang thêm học sinh vào các lớp học
+
+    Input: request
+
+    Trả về: Chuyển hướng người dùng tới trang tạo danh sách lớp
+        - Nếu số lượng học sinh sau khi thêm vào lớn hơn số học sinh tối đa của lớp 
+        trả về thông báo Lớp đã đủ học sinh
+        - Nếu số lượng học sinh sau khi thêm vào bé hơn số học sinh tối đa của lớp 
+        trả về thông báo thêm học sinh thành công
+    """
     nam_hoc_options = NamHoc.objects.all()
     ten_lop_options = LopHoc.objects.all()
 
@@ -341,8 +352,7 @@ def tao_danh_sach_lop(request):
                 if so_hien_tai + len(hoc_sinh_ids)>= lop_hoc.so_hoc_sinh:
                     messages.error(
                         request,
-                        f"Lớp {lop_hoc.ma_lop} đã đủ học sinh ({so_hien_tai}/{lop_hoc.so_hoc_sinh}). Không thể thêm học sinh mới.",
-                        extra_tags='full_class'
+                        "Lớp đã đủ học sinh. Không thể thêm học sinh mới."
                     )
                 else:
                     for hoc_sinh_id in hoc_sinh_ids:
@@ -351,8 +361,7 @@ def tao_danh_sach_lop(request):
 
                     messages.success(
                         request,
-                        f"Học sinh đã được thêm vào lớp {lop_hoc.ma_lop}.",
-                        extra_tags='add_hs_lop'
+                        "Thêm học sinh vào lớp thành công"
                     )
                     return redirect(f'/lop-hoc?nam_hoc={lop_hoc.nam_hoc.nam}')  
             except LopHoc.DoesNotExist:
@@ -945,7 +954,7 @@ def huy_phan_cong(request, giao_vien_id, lop_hoc_id):
     return redirect('phan-cong-gv', giao_vien_id=giao_vien.id)
 
 
-
+# Trang tổng kết 
 @login_required(login_url='dang-nhap')
 def tong_ket(request):
     """
@@ -1012,7 +1021,7 @@ def tong_ket(request):
     return render(request, 'school_app/tong_ket.html', context)
 
 
-
+# Lấy danh sách kết quả xếp loại học sinh
 @login_required(login_url='dang-nhap')
 def danh_sach_kq_hoc_sinh(request, nam_hoc_id, status):
     """
@@ -1067,7 +1076,7 @@ def danh_sach_kq_hoc_sinh(request, nam_hoc_id, status):
 
 
 
-
+# Kết quả học tập của học sinh
 @login_required(login_url='dang-nhap')
 def ket_qua_hoc_tap(request):
     """
@@ -1139,7 +1148,7 @@ def ket_qua_hoc_tap(request):
 
 
 
-
+#Quản lý điểm giáo viên bộ môn
 @login_required(login_url='dang-nhap')
 def quan_ly_diem(request):
     """
@@ -1193,6 +1202,7 @@ def quan_ly_diem(request):
     return render(request, 'school_app/diem_giao_vien.html', context)
 
 
+# Cập nhật điểm 
 @login_required(login_url='dang-nhap')
 def cap_nhat_diem_gv(request, diem_id):
     """
@@ -1222,6 +1232,7 @@ def cap_nhat_diem_gv(request, diem_id):
     return render(request, 'school_app/cap_nhat_diem_gv.html', {'form': form, 'ket_qua': ket_qua})
 
 
+# Danh sách lớp học giáo viên chủ nhiệm
 @login_required(login_url='dang-nhap')
 def lop_chu_nhiem(request):
     """
@@ -1238,7 +1249,6 @@ def lop_chu_nhiem(request):
     nam_hoc_id = request.GET.get('nam_hoc')
     print(nam_hoc_id)
     lop_chu_nhiem = LopHoc.objects.filter(giao_vien_chu_nhiem=giao_vien)
-    nam_hoc = lop_chu_nhiem.first().nam_hoc
     if nam_hoc_id:
         lop_chu_nhiem = lop_chu_nhiem.filter(nam_hoc_id=nam_hoc_id)
 
@@ -1246,7 +1256,7 @@ def lop_chu_nhiem(request):
         hoc_sinh_list = HocSinh.objects.filter(lop_hoc__in=lop_chu_nhiem).distinct()
         print(hoc_sinh_list)
         for hs in hoc_sinh_list:
-            ket_qua = KetQuaNamHoc.objects.filter(hoc_sinh=hs, nam_hoc=nam_hoc).first()
+            ket_qua = KetQuaNamHoc.objects.filter(hoc_sinh=hs, nam_hoc=nam_hoc_id).first()
             hs.hanh_kiem = ket_qua.hanh_kiem if ket_qua else None
     else:
         hoc_sinh_list = []
@@ -1257,6 +1267,8 @@ def lop_chu_nhiem(request):
         'lop': lop_chu_nhiem.first() if lop_chu_nhiem.exists() else None
     })
 
+
+# Xem kết quả của lớp học
 @login_required(login_url='dang-nhap')
 def xem_ket_qua_lop(request, lop_id):
     """
@@ -1266,21 +1278,17 @@ def xem_ket_qua_lop(request, lop_id):
 
         Trả về: Danh sách điểm của các học sinh lọc theo từng môn
     """
-    # Lấy tham số lọc từ query string (mặc định để trống)
-    hoc_ky = request.GET.get('hoc_ky', '1')  # Học kỳ mặc định là '1'
-    mon_hoc_id = request.GET.get('mon_hoc', None)  # Mặc định không chọn môn học
+    hoc_ky = request.GET.get('hoc_ky', '1') 
+    mon_hoc_id = request.GET.get('mon_hoc', None)  
 
-    # Truy xuất thông tin lớp học
     lop_hoc = LopHoc.objects.get(id=lop_id)
     hoc_sinh_list = HocSinh.objects.filter(lop_hoc=lop_hoc)
 
-    # Truy xuất danh sách môn học và năm học
     danh_sach_mon_hoc = MonHoc.objects.all()
     nam_hoc = lop_hoc.nam_hoc
 
-    # Kết quả lớp học
     ket_qua_lop = []
-    if mon_hoc_id:  # Chỉ lọc khi có chọn môn học
+    if mon_hoc_id:  
         mon_hoc = MonHoc.objects.get(id=mon_hoc_id)
         for hoc_sinh in hoc_sinh_list:
             ket_qua = KetQua.objects.filter(

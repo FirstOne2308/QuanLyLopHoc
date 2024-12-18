@@ -1,11 +1,11 @@
 {% extends 'school_app/base.html' %}
 
 {% block content %}
-<div class="container">
+<div class="ds-update-container">
   <h2>Cập nhật môn học</h2>
   <form method="POST">
     {% csrf_token %}
-    <div class="form-group">
+    <div class="input_field">
       <label for="ma_mon">Mã môn học:</label>
       <input 
         type="text" 
@@ -15,7 +15,7 @@
         value="{{ form.initial.ma_mon|default:'' }}" 
         required>
     </div>
-    <div class="form-group">
+    <div class="input_field">
       <label for="ten_mon">Tên môn học:</label>
       <input 
         type="text" 
@@ -25,7 +25,7 @@
         value="{{ form.initial.ten_mon|default:'' }}" 
         required>
     </div>
-    <div class="form-group">
+    <div class="input_field">
       <label for="diem_chuan">Điểm chuẩn:</label>
       <input 
         type="number" 
@@ -36,8 +36,12 @@
         step="0.01" 
         required>
     </div>
-    <button type="submit" class="btn btn-save">Lưu</button>
-    <a href="{% url 'mon-hoc' %}" class="btn btn-cancel">Hủy</a>
+    <div class="input_field">
+      <button type="submit" class="btn-submit">Lưu</button>
+    </div>
+    <a href="{% url 'mon-hoc' %}">
+      <button type="button" class="btn-cancel">Hủy</button>
+    </a>
   </form>
 </div>
 {% endblock %}

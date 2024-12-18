@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <title>Quan Ly Hoc Sinh</title>
-  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 
 <body>
@@ -22,22 +22,12 @@
           <i class="fa-solid fa-xmark"></i>
         </span>
       </div>
-      <a class="header__logo" href="#">
+      <a class="header__logo" href="/">
         <img src="{% static 'images/logo.webp' %}">
         <h2>Quản lý học sinh</h2>
       </a>
     </div>
     <div class="right-section">
-      <div class="message-icon-container">
-        <span class="login-input-text bg-white text-muted"><i class="fa-regular fa-envelope"></i></span>
-        <div class="tooltip">Tin nhắn</div>
-        <!-- <div class="message-count">3</div> -->
-      </div>
-      <div class="notification-icon-container">
-        <span class="login-input-text bg-white text-muted"><i class="fa-regular fa-bell"></i></span>
-        <div class="tooltip">Thông báo</div>
-        <!-- <div class="notification-count">2</div> -->
-      </div>
       <nav class="header-menu">
         <div class="user-menu">
           <a href="#">
@@ -107,24 +97,24 @@
       Điểm
     </a>
     <a href="{%url 'tong-ket'%}" class="sidebar-link">
-      <img src="{% static 'images/searches.png' %}">
+      <img src="{% static 'images/chart.png' %}">
       Báo cáo tổng kết
     </a>
     {% elif user.vai_tro == '3' %}
     <!-- Hiển thị các mục phù hợp với vai_tro = 1 -->
     <a href="{%url 'home'%}" class="sidebar-link">
-      <img src="{% static 'images/home.png' %}">
+      <img src="{% static 'images/houses.png' %}">
       Trang chủ
     </a>
     <a href="{%url 'ket-qua-hoc-tap'%}" class="sidebar-link">
-      <img src="{% static 'images/student.png' %}">
+      <img src="{% static 'images/results.png' %}">
       Kết quả học tập
     </a>
     
     {% else %}
     <!-- Trường hợp không xác định -->
     <a href="{%url 'home'%}" class="sidebar-link">
-      <img src="{% static 'images/home.png' %}">
+      <img src="{% static 'images/houses.png' %}">
       Trang chủ
     </a>
     <a href="{%url 'quan-ly-diem'%}" class="sidebar-link">

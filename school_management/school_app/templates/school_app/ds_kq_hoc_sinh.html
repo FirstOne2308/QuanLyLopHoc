@@ -1,56 +1,59 @@
 {% extends 'school_app/base.html' %}
 
 {% block content %}
-<h1>Danh Sách Học Sinh 
-    {% if status == 'khong_dat' %}Không Đạt
-    {% elif status == 'trung_binh' %}Trung Bình
-    {% elif status == 'kha' %}Khá
-    {% elif status == 'gioi' %}Giỏi
-    {% else %}Không xác định
-    {% endif %}
-</h1>
-
-{% if hoc_sinh_list  %}
-<table>
-    <thead>
-        <tr>
-            <th>STT</th>
-            <th>Họ tên</th>
-            <th>Lớp</th>
-            <th>Năm học</th>
-            <th>Điểm tổng kết</th>
-            <th>Hạnh kiểm</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for hoc_sinh in hoc_sinh_list  %}
-        <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ hoc_sinh.ho_ten }}</td>
-            <td>{{ hoc_sinh.ma_lop }}</td>
-            <td>{{ hoc_sinh.nam_hoc }}</td>
-            <td>{{ hoc_sinh.diem_tong_ket|floatformat:2|default:"N/A" }}</td>
-            <td>
-                {% if hoc_sinh.hanh_kiem == 'Yeu' %}
-                  Yếu
-                {% elif hoc_sinh.hanh_kiem == 'TrungBinh' %}
-                  Trung bình
-                {% elif hoc_sinh.hanh_kiem == 'Kha' %}
-                  Khá
-                {% elif hoc_sinh.hanh_kiem == 'Tot' %}
-                  Tốt
-                {% else %}
-                  Chưa xét
-                {% endif %}
-              </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-{% else %}
-<p>Không có học sinh nào trong danh sách này.</p>
-{% endif %}
-
-<a href="{% url 'tong-ket' %}?nam_hoc_id={{nam_hoc_id}}&mon_hoc_id={{''}} ">Quay lại</a>    
+<div class="ds-container">
+  <h2 style="font-weight: 600; color: #2c3e50;">Danh Sách Học Sinh 
+      {% if status == 'khong_dat' %}Không Đạt
+      {% elif status == 'trung_binh' %}Trung Bình
+      {% elif status == 'kha' %}Khá
+      {% elif status == 'gioi' %}Giỏi
+      {% else %}Không xác định
+      {% endif %}
+  </h2>
+  
+  {% if hoc_sinh_list  %}
+  <table class="table-list">
+      <thead>
+          <tr>
+              <th>STT</th>
+              <th>Họ tên</th>
+              <th>Lớp</th>
+              <th>Năm học</th>
+              <th>Điểm tổng kết</th>
+              <th>Hạnh kiểm</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for hoc_sinh in hoc_sinh_list  %}
+          <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ hoc_sinh.ho_ten }}</td>
+              <td>{{ hoc_sinh.ma_lop }}</td>
+              <td>{{ hoc_sinh.nam_hoc }}</td>
+              <td>{{ hoc_sinh.diem_tong_ket|floatformat:2|default:"N/A" }}</td>
+              <td>
+                  {% if hoc_sinh.hanh_kiem == 'Yeu' %}
+                    Yếu
+                  {% elif hoc_sinh.hanh_kiem == 'TrungBinh' %}
+                    Trung bình
+                  {% elif hoc_sinh.hanh_kiem == 'Kha' %}
+                    Khá
+                  {% elif hoc_sinh.hanh_kiem == 'Tot' %}
+                    Tốt
+                  {% else %}
+                    Chưa xét
+                  {% endif %}
+                </td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+  
+  {% else %}
+  <p style="margin: 30px 0;">Không có học sinh nào trong danh sách này.</p>
+  {% endif %}
+  <a href="{% url 'tong-ket' %}?nam_hoc_id={{nam_hoc_id}}&mon_hoc_id={{''}}" style="display: block; margin: 20px 0;">
+    <button class="btn-back">Quay lại</button>
+</a>
+</div>
 {% endblock content %}

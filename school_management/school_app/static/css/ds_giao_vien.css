@@ -11,35 +11,6 @@
     color: #2c3e50;
 }
 
-.ds-giao-vien-list {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-.ds-giao-vien-list th, .ds-giao-vien-list td {
-    text-align: left;
-    padding: 10px;
-    border: 1px solid #ddd;
-}
-
-.ds-giao-vien-list th {
-    background: #2c3e50;
-    color: #fff;
-}
-
-.ds-giao-vien-list tr:nth-child(even) {
-    background: #f9f9f9;
-}
-
-.ds-giao-vien-list tr:hover {
-    background: #f1f1f1;
-}
-
-.ds-giao-vien-list td {
-    vertical-align: middle;
-}
-
 .ds-giao-vien-wrap-btn {
     display: flex;
     flex-direction: column;

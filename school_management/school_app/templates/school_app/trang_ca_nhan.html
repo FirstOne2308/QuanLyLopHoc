@@ -9,47 +9,51 @@
     <title>Thông tin cá nhân</title>
 </head>
 <body>
-    <h2>Thông tin cá nhân</h2>
-
-    <table border="1">
-        <tr>
-            <th>Họ và tên</th>
-            <td>{{ user.ho_ten }}</td>
-        </tr>
-        <tr>
-            <th>Ngày sinh</th>
-            <td>{{ user.ngay_sinh |date:"d/m/Y"}}</td>
-        </tr>
-        <tr>
-            <th>Giới tính</th>
-            <td>
-                {% if user.gioi_tinh == '1' %}
-                    Nam
-                {% elif user.gioi_tinh == '0' %}
-                    Nữ
-                {% else %}
-                    Không xác định
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>{{ user.email }}</td>
-        </tr>
-        {%if user.so_dien_thoai%}
-        <tr>
-            <th>Số điện thoại</th>
-            <td>{{ user.so_dien_thoai }}</td>
-        </tr>
-        {%endif %}
-        <tr>
-            <th>Địa chỉ</th>
-            <td>{{ user.dia_chi }}</td>
-        </tr>
-    </table>
-
-    <br>
-    <a href="{% url 'home' %}">Trở về trang chủ</a>
+    <div class="ds-container">
+        <h2>Thông tin cá nhân</h2>
+    
+        <table class="table-custom">
+            <tr>
+                <th>Họ và tên</th>
+                <td>{{ user.ho_ten }}</td>
+            </tr>
+            <tr>
+                <th>Ngày sinh</th>
+                <td>{{ user.ngay_sinh |date:"d/m/Y"}}</td>
+            </tr>
+            <tr>
+                <th>Giới tính</th>
+                <td>
+                    {% if user.gioi_tinh == '1' %}
+                        Nam
+                    {% elif user.gioi_tinh == '0' %}
+                        Nữ
+                    {% else %}
+                        Không xác định
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ user.email }}</td>
+            </tr>
+            {%if user.so_dien_thoai%}
+            <tr>
+                <th>Số điện thoại</th>
+                <td>{{ user.so_dien_thoai }}</td>
+            </tr>
+            {%endif %}
+            <tr>
+                <th>Địa chỉ</th>
+                <td>{{ user.dia_chi }}</td>
+            </tr>
+        </table>
+    
+        <br>
+        <a href="{% url 'home' %}">
+            <button class="btn-back">Trở về trang chủ</button>
+        </a>
+    </div>
 </body>
 </html>
 {% endblock content %}

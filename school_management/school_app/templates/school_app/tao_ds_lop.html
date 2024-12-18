@@ -1,15 +1,13 @@
 {% extends 'school_app/base.html' %}
 
 {% block content %}
-  <div class="tao-danh-sach-lop-container">
+  <div class="ds-container">
     <h2>Tạo danh sách lớp</h2>
     {% if messages %}
     <div class="alert alert-danger">
-      {% if 'full_class' in message.tags %}
       {% for message in messages %}
         <p>{{ message }}</p>
       {% endfor %}
-      {% endif %}
     </div>
   {% endif %}
     <!-- Form lọc năm học và lớp -->
@@ -39,7 +37,7 @@
       {% csrf_token %}
       <!-- Truyền id lớp qua POST -->
       <input type="hidden" name="lop_id" value="{{ selected_ten_lop }}">
-      <table class="student-list">
+      <table class="table-list">
           <thead>
               <tr>
                   <th>Chọn</th>
@@ -72,13 +70,15 @@
           </tbody>
       </table>
   
-      <button type="submit" class="btn-save">Lưu danh sách</button>
+      <button style="margin-top: 10px;" type="submit" class="btn-submit">Lưu danh sách</button>
   </form>
   
     
 
     <!-- Nút Thoát -->
-    <a href="{% url 'lop-hoc' %}" class="btn-cancel">Thoát</a>
+    <a href="{% url 'lop-hoc' %}">
+      <button type="button" class="btn-cancel">Thoát</button>
+    </a>
   </div>
 
   <!-- JavaScript -->

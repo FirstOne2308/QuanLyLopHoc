@@ -10,18 +10,22 @@
       {% endif %}
     </div>
   {% endif %}
-  <div class="lop-hoc-container">
-    <h2>Danh sách lớp học</h2>
-
-    <!-- Nút thêm lớp học mới -->
-    <a href="{% url 'them-lop-hoc' %}">
-      <button class="btn-add">Thêm lớp học mới</button>
-    </a>
-
-    <!-- Nút tạo danh sách lớp -->
-    <a href="{% url 'tao-ds-lop' %}">
-      <button class="btn-add">Tạo danh sách lớp</button>
-    </a>
+  <div class="ds-container">
+    <div class="class-add">
+      <h2>Danh sách lớp học</h2>
+  
+      <div class="wrap-btn">
+        <!-- Nút thêm lớp học mới -->
+        <a href="{% url 'them-lop-hoc' %}">
+          <button class="btn-add">Thêm lớp học mới</button>
+        </a>
+    
+        <!-- Nút tạo danh sách lớp -->
+        <a href="{% url 'tao-ds-lop' %}">
+          <button class="btn-add">Tạo danh sách lớp</button>
+        </a>
+      </div>
+    </div>
 
     <!-- Form lọc -->
     <form method="GET" class="filter-form" id="filter-form">
@@ -54,7 +58,7 @@
     {% endif %} -->
 
     <!-- Danh sách lớp học -->
-    <table class="lop-hoc-table">
+    <table class="table-list">
         <thead>
           <tr>
             <th>Tên lớp</th>
@@ -71,12 +75,13 @@
               <td>{{ lop_hoc.nam_hoc }}</td>
               <td>{{ lop_hoc.so_hs }}</td>
               <td>{{ lop_hoc.giao_vien_chu_nhiem }}</td>
-              <td>
-                <a href="{% url 'danh-sach-lop' lop_hoc.id %}">Xem danh sách</a> |
-                <form action="{% url 'xoa-lop-hoc' lop_hoc.id %}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lớp này?');">
+              <td class="td-custom">
+                <a class="link-view" href="{% url 'danh-sach-lop' lop_hoc.id %}">Xem danh sách</a>
+                <form class="delete-form" action="{% url 'xoa-lop-hoc' lop_hoc.id %}" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lớp này?');">
                     {% csrf_token %}
                     <button type="submit" class="btn-delete">Xóa</button>
-                </form> </td>
+                </form> 
+              </td>
             </tr>
           {% empty %}
             <tr>

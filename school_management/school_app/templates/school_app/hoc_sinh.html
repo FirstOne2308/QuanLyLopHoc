@@ -4,7 +4,7 @@
 {% block content %}
 <link href="{% static 'css/hoc_sinh.css' %}" rel="stylesheet" />
 <div class="ds-container">
-  <div class="hoc-sinh-add">
+  <div class="hoc-sinh-add" style="width: unset;">
     <h2>Danh sách học sinh</h2>
     <a href="{% url 'them-hoc-sinh' %}">
       <button class="btn-add">Thêm học sinh mới</button>
@@ -21,7 +21,7 @@
   </form>
 
   <!-- Bảng danh sách học sinh -->
-  <table class="hoc-sinh-list">
+  <table class="table-list">
     <thead>
       <tr>
         <th>STT</th>

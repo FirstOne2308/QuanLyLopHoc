@@ -262,6 +262,7 @@ class GiaoVien(models.Model):
     nguoi_dung = models.OneToOneField(NguoiDung, on_delete=models.CASCADE)
     mon_day = models.ForeignKey(MonHoc, blank=True, on_delete=models.CASCADE)
     lop_day = models.ManyToManyField(LopHoc, blank=True)
+
     def __str__(self):
         """
             Hàm biểu diễn giáo viên dưới dạng string
@@ -338,6 +339,7 @@ class KetQua(models.Model):
             ket_qua_mon_hoc.save()
 
 
+#Bảng kết quả môn học
 class KetQuaMonHoc(models.Model):
     """
         Mô hình này lấy dữ liệu từ bảng KetQua để tính toán điểm tổng kết của học sinh dựa trên điểm tổng
@@ -352,7 +354,6 @@ class KetQuaMonHoc(models.Model):
     hoc_sinh = models.ForeignKey(HocSinh, on_delete=models.CASCADE)
     mon_hoc = models.ForeignKey(MonHoc, on_delete=models.CASCADE)
     nam_hoc = models.ForeignKey(NamHoc, on_delete=models.CASCADE)
-    
     diem_tong_ket = models.FloatField(null=True, blank=True)
     
     def save(self, *args, **kwargs):
@@ -400,7 +401,7 @@ class KetQuaMonHoc(models.Model):
         return f"{self.hoc_sinh.nguoi_dung.username} - {self.mon_hoc.ten_mon} - {self.nam_hoc.nam}"
 
 
-
+# Bảng kết quả năm học
 class KetQuaNamHoc(models.Model):
     """
     Mô hình KetQuaNamHoc lưu kết quả tổng kết của học sinh cho cả năm học.

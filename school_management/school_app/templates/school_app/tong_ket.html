@@ -8,43 +8,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tổng Kết Điểm Trung Bình</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        canvas {
-            margin-top: 20px;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Tổng Kết Điểm Trung Bình Các Lớp</h1>
-        <form method="GET">
-            <label for="namHoc">Chọn Năm Học:</label>
-            <select id="namHoc" name="nam_hoc_id" onchange="this.form.submit()">
-                <option value="">-- Chọn Năm Học --</option>
-                {% for nam in nam_hocs %}
-                <option value="{{ nam.id }}" {% if nam.id == selected_nam_hoc %}selected{% endif %}>
-                    {{ nam.nam }}
-                </option>
-                {% endfor %}
-            </select>
+    <div class="ds-container">
+        <h2 style="font-weight: 600; color: #2c3e50;">Tổng Kết Điểm Trung Bình Các Lớp</h1>
+        <form method="GET" class="forms">
+            <div style="flex: 1">
+                <label for="namHoc">Chọn Năm Học:</label>
+                <select id="namHoc" name="nam_hoc_id" onchange="this.form.submit()" style="width: 100%;">
+                    <option value="">-- Chọn Năm Học --</option>
+                    {% for nam in nam_hocs %}
+                    <option value="{{ nam.id }}" {% if nam.id == selected_nam_hoc %}selected{% endif %}>
+                        {{ nam.nam }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <label for="monHoc">Chọn Môn Học:</label>
-            <select id="monHoc" name="mon_hoc_id" onchange="this.form.submit()">
-                <option value="">-- Chọn Môn Học --</option>
-                {% for mon in mon_hocs %}
-                <option value="{{ mon.id }}" {% if mon.id == selected_mon_hoc %}selected{% endif %}>
-                    {{ mon.ten_mon }}
-                </option>
-                {% endfor %}
-            </select>
+            <div style="flex: 1;">
+                <label for="monHoc">Chọn Môn Học:</label>
+                <select id="monHoc" name="mon_hoc_id" onchange="this.form.submit()" style="width: 100%;">
+                    <option value="">-- Chọn Môn Học --</option>
+                    {% for mon in mon_hocs %}
+                    <option value="{{ mon.id }}" {% if mon.id == selected_mon_hoc %}selected{% endif %}>
+                        {{ mon.ten_mon }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
         </form>
         
 
@@ -117,7 +108,7 @@
             });
         </script>
         {% else %}
-        <p>Không có dữ liệu.</p>
+        <p class="no-data">Không có dữ liệu.</p>
         {% endif %}
     </div>
 </body>

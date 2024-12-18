@@ -1,60 +1,64 @@
 {% extends 'school_app/base.html' %}
 
 {% block content %}
-  <h2>Danh sách điểm</h2>
+<div class="ds-container">
+  <h2 style="font-weight: 600; color: #2c3e50;">Danh sách điểm</h2>
 
   <!-- Form lọc -->
-  <form method="GET" action="{% url 'diem' %}" class="filter-form">
-    <div class="filter-item">
-      <label for="nam_hoc">Năm học:</label>
-      <select name="nam_hoc" id="nam_hoc" onchange="this.form.submit()">
-        <option value="">Chọn năm học</option>
-        {% for nam_hoc in nam_hoc_list %}
-          <option value="{{ nam_hoc.nam }}" {% if nam_hoc.nam == selected_nam_hoc %}selected{% endif %}>{{ nam_hoc.nam }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    
-    <div class="filter-item">
-      <label for="lop_hoc">Lớp học:</label>
-      <select name="lop_hoc" id="lop_hoc" onchange="this.form.submit()">
-        <option value="">Chọn lớp học</option>
-        {% for lop_hoc in lop_hoc_list %}
-          <option value="{{ lop_hoc.ma_lop }}" {% if lop_hoc.ma_lop == selected_lop_hoc %}selected{% endif %}>{{ lop_hoc.ma_lop }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    
-    <div class="filter-item">
-      <label for="mon_hoc">Môn học:</label>
-      <select name="mon_hoc" id="mon_hoc" onchange="this.form.submit()">
-        <option value="">Chọn môn học</option>
-        {% for mon_hoc in mon_hoc_list %}
-          <option value="{{ mon_hoc.ten_mon }}" {% if mon_hoc.ten_mon == selected_mon_hoc %}selected{% endif %}>{{ mon_hoc.ten_mon }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    
-    <div class="filter-item">
-      <label for="hoc_ki">Học kỳ:</label>
-      <select name="hoc_ki" id="hoc_ki" onchange="this.form.submit()">
-        <option value="">Chọn học kỳ</option>
-        <option value="1" {% if selected_hoc_ki == '1' %}selected{% endif %}>Học kỳ 1</option>
-        <option value="2" {% if selected_hoc_ki == '2' %}selected{% endif %}>Học kỳ 2</option>
-      </select>
-    </div>
-
-    <div class="filter-item">
-      <label for="search_name">Tìm kiếm theo tên học sinh:</label>
-      <input type="text" name="search_name" id="search_name" value="{{ search_name }}" placeholder="Nhập tên học sinh" onchange="this.form.submit()">
+  <form method="GET" action="{% url 'diem' %}" class="filter-form filter-form-custom">
+    <div class="filter-choice">
+      <div class="filter-item">
+        <label for="nam_hoc">Năm học:</label>
+        <select name="nam_hoc" id="nam_hoc" onchange="this.form.submit()">
+          <option value="">Chọn năm học</option>
+          {% for nam_hoc in nam_hoc_list %}
+            <option value="{{ nam_hoc.nam }}" {% if nam_hoc.nam == selected_nam_hoc %}selected{% endif %}>{{ nam_hoc.nam }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="filter-item">
+        <label for="lop_hoc">Lớp học:</label>
+        <select name="lop_hoc" id="lop_hoc" onchange="this.form.submit()">
+          <option value="">Chọn lớp học</option>
+          {% for lop_hoc in lop_hoc_list %}
+            <option value="{{ lop_hoc.ma_lop }}" {% if lop_hoc.ma_lop == selected_lop_hoc %}selected{% endif %}>{{ lop_hoc.ma_lop }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="filter-item">
+        <label for="mon_hoc">Môn học:</label>
+        <select name="mon_hoc" id="mon_hoc" onchange="this.form.submit()">
+          <option value="">Chọn môn học</option>
+          {% for mon_hoc in mon_hoc_list %}
+            <option value="{{ mon_hoc.ten_mon }}" {% if mon_hoc.ten_mon == selected_mon_hoc %}selected{% endif %}>{{ mon_hoc.ten_mon }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="filter-item">
+        <label for="hoc_ki">Học kỳ:</label>
+        <select name="hoc_ki" id="hoc_ki" onchange="this.form.submit()">
+          <option value="">Chọn học kỳ</option>
+          <option value="1" {% if selected_hoc_ki == '1' %}selected{% endif %}>Học kỳ 1</option>
+          <option value="2" {% if selected_hoc_ki == '2' %}selected{% endif %}>Học kỳ 2</option>
+        </select>
+      </div>
     </div>
 
-    <button type="submit" class="filter-btn">Lọc</button>
+    <div class="filter-search">
+      <div class="filter-item">
+        <label for="search_name">Tìm kiếm theo tên học sinh:</label>
+        <input type="text" name="search_name" id="search_name" value="{{ search_name }}" placeholder="Nhập tên học sinh" onchange="this.form.submit()">
+      </div>
+  
+      <button type="submit" class="btn-search">Lọc</button>
+    </div>
   </form>
 
   <!-- Bảng điểm -->
-  <div class="score-table-container">
-    <table class="student-list">
+    <table class="table-list">
       <thead>
         <tr>
           <th>STT</th>
@@ -81,8 +85,10 @@
             <td>{{ ket_qua.diem_gk|default:0 }}</td>
             <td>{{ ket_qua.diem_ck|default:0 }}</td>
             <td>{{ ket_qua.diem_tong|default:0 }}</td>
-            <td>
-                <a href="{% url 'cap-nhat-diem' ket_qua.id %}" class="btn-delete">Chỉnh sửa</a>
+            <td style="display: flex; justify-content: center;">
+                <a href="{% url 'cap-nhat-diem' ket_qua.id %}">
+                  <button type="button" class="btn-edit">Chỉnh sửa</button>
+                </a>
             </td>
           </tr>
         {% empty %}
@@ -92,21 +98,28 @@
         {% endfor %}
       </tbody>
     </table>
-  </div>
 
   <!-- Phân trang -->
   <div class="pagination">
-    {% if ket_qua_list.has_previous %}
-      <a href="?page=1" class="page-link">Đầu</a>
-      <a href="?page={{ ket_qua_list.previous_page_number }}" class="page-link">Trước</a>
-    {% endif %}
+    <div class="step-links">
+        {% if ket_qua_list.has_previous %}
+        <a href="?page=1">Đầu</a>
+        <a href="?page={{ ket_qua_list.previous_page_number }}">Trước</a>
+        {% else %}
+        <a class="disabled" disabled>Đầu</a>
+        <a class="disabled" disabled>Trước</a>
+        {% endif %}
 
-    <span class="current-page">Trang {{ ket_qua_list.number }} của {{ ket_qua_list.paginator.num_pages }}</span>
+        <span class="current">Trang {{ ket_qua_list.number }} của {{ ket_qua_list.paginator.num_pages }}</span>
 
-    {% if ket_qua_list.has_next %}
-      <a href="?page={{ ket_qua_list.next_page_number }}" class="page-link">Sau</a>
-      <a href="?page={{ ket_qua_list.paginator.num_pages }}" class="page-link">Cuối</a>
-    {% endif %}
+        {% if ket_qua_list.has_next %}
+        <a href="?page={{ ket_qua_list.next_page_number }}">Sau</a>
+        <a href="?page={{ ket_qua_list.paginator.num_pages }}">Cuối</a>
+        {% else %}
+        <a class="disabled" disabled>Sau</a>
+        <a class="disabled" disabled>Cuối</a>
+        {% endif %}
+    </div>
   </div>
 
   <!-- Nút xuất điểm khi tất cả các trường được chọn -->
@@ -115,6 +128,8 @@
        class="btn btn-add">
       Xuất điểm
     </a>
+
+</div>
   {% endif %}
   
 {% endblock %}

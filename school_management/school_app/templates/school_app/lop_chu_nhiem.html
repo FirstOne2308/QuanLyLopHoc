@@ -1,14 +1,14 @@
 {% extends 'school_app/base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Lớp Chủ Nhiệm</h2>
+<div class="ds-container mt-4">
+    <h2 style="font-weight: 600; color: #2c3e50;">Lớp Chủ Nhiệm</h2>
 
     <!-- Form Lọc Năm Học -->
-    <form method="GET" action="{% url 'lop-chu-nhiem' %}">
+    <form method="GET" action="{% url 'lop-chu-nhiem' %}" class="wrap-form-group">
         <div class="form-group">
             <label for="nam_hoc">Năm học:</label>
-            <select name="nam_hoc" id="nam_hoc" class="form-control">
+            <select name="nam_hoc" id="nam_hoc" class="input-field">
                 <option value="">--- Chọn năm học ---</option>
                 {% for nh in nam_hoc_list %}
                     <option value="{{ nh.id }}" {% if nh.id|stringformat:"s" == request.GET.nam_hoc %}selected{% endif %}>
@@ -17,7 +17,7 @@
                 {% endfor %}
             </select>
         </div>
-        <button type="submit" class="btn btn-primary mt-2">Lọc</button>
+        <button type="submit" class="btn-search">Lọc</button>
     </form>
 
     {% if not request.GET.nam_hoc %}
@@ -25,12 +25,14 @@
     {% endif %}
 
     {% if hoc_sinh_list and request.GET.nam_hoc%}
-    <a href="{% url 'xem-ket-qua-lop' lop.id %}">Xem kết quả lớp</a>
-        <h3 class="mt-4">Danh sách học sinh lớp {{lop.ma_lop}}:</h3>
-        <table class="table table-bordered mt-3">
+    <a href="{% url 'xem-ket-qua-lop' lop.id %}">
+        <button class="btn-add">Xem kết quả lớp</button>
+    </a>
+        <h3>Danh sách học sinh lớp {{lop.ma_lop}}:</h3>
+        <table class="table-list">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>STT</th>
                     <th>Họ Tên</th>
                     <th>Ngày Sinh</th>
                     <th>Giới Tính</th>
@@ -50,7 +52,7 @@
                     <td>{{ hs.nguoi_dung.email }}</td>
                     <td>
                         <!-- Form Cập nhật hạnh kiểm -->
-                        <form action="{% url 'sua-hanh-kiem' lop.id hs.id %}" method="POST">
+                        <form action="{% url 'sua-hanh-kiem' lop.id hs.id %}" method="POST" style="display: flex; justify-content: center; gap: 20px;">
                             {% csrf_token %}
                             <select name="hanh_kiem">
                                 <option value="" {% if not hs.hanh_kiem %}selected{% endif %}>Chưa xét</option>
@@ -59,7 +61,7 @@
                                 <option value="TrungBinh" {% if hs.hanh_kiem == "TrungBinh" %}selected{% endif %}>Trung bình</option>
                                 <option value="Yeu" {% if hs.hanh_kiem == "Yeu" %}selected{% endif %}>Yếu</option>
                             </select>
-                            <button type="submit" class="btn btn-primary btn-sm mt-2">Cập nhật</button>
+                            <button type="submit" class="btn-update">Cập nhật</button>
                         </form>
                     </td>
                 </tr>

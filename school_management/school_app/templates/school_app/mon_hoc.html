@@ -1,26 +1,29 @@
 {% extends 'school_app/base.html' %}
 
 {% block content %}
-<div class="mon-hoc-container">
-    <h2>Quản lý Môn học</h2>
+<div class="ds-container">
+    <div class="wrap-add">
+        <h2 style="font-weight: 600; color: #2c3e50;">Danh sách môn học</h2>
+        <!-- Nút chuyển đến trang thêm môn học -->
+        <a href="{%url 'them-mon-hoc'%}">
+            <button class="btn-add">Thêm môn học</button>
+        </a>
+    </div>
 
     <!-- Hiển thị thông báo -->
     {% if messages %}
     <div class="messages">
         {% for message in messages %}
-            {% if 'add_subj' in message.tags %}
-                <div class="alert {{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endif %}
+        {% if 'add_subj' in message.tags %}
+        <div class="alert {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endif %}
         {% endfor %}
     </div>
     {% endif %}
 
-
-    <!-- Danh sách môn học -->
-    <h3>Danh sách Môn học</h3>
-    <table class="student-list">
+    <table class="table-list">
         <thead>
             <tr>
                 <th>STT</th>
@@ -37,14 +40,14 @@
                 <td>{{ mon_hoc.ma_mon }}</td>
                 <td>{{ mon_hoc.ten_mon }}</td>
                 <td>{{ mon_hoc.diem_chuan }}</td>
-                <td>
+                <td style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
                     <!-- Nút xóa môn học -->
-                    <form method="POST" action="{%url 'xoa-mon-hoc' mon_hoc.id%}" style="display:inline;">
+                    <form method="POST" action="{%url 'xoa-mon-hoc' mon_hoc.id%}">
                         {% csrf_token %}
                         <button type="submit" class="btn-delete"
                             onclick="return confirm('Bạn có chắc chắn muốn xóa môn học này?')">Xóa</button>
                     </form>
-                    <form method="POST" action="{%url 'sua-mon-hoc' mon_hoc.id%}" style="display:inline;">
+                    <form method="POST" action="{%url 'sua-mon-hoc' mon_hoc.id%}">
                         {% csrf_token %}
                         <button type="submit" class="btn-edit">Sửa</button>
                     </form>
@@ -57,9 +60,6 @@
             {% endfor %}
         </tbody>
     </table>
-
-    <!-- Nút chuyển đến trang thêm môn học -->
-    <a href="{%url 'them-mon-hoc'%}" class="btn-add">Thêm môn học</a>
 </div>
 
 <script>

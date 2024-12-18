@@ -1,14 +1,16 @@
 {% extends 'school_app/base.html' %}
 
 {% block content %}
+<div class="ds-update-container">
   <h2>Thêm điểm cho học sinh</h2>
 
   <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}  <!-- Hiển thị các trường trong form -->
-    <button type="submit" class="btn btn-primary">Lưu điểm</button>
+    <button type="submit" class="btn-submit">Lưu điểm</button>
   </form>
-
-  <br>
-  <a href="{% url 'quan-ly-diem' %}">Quay lại danh sách điểm</a>
+  <a href="{% url 'quan-ly-diem' %}">
+    <button class="btn-cancel">Quay lại danh sách điểm</button>
+  </a>
+</div>
 {% endblock %}

@@ -1,20 +1,24 @@
 {% extends 'school_app/base.html' %}
 
 {% block content %}
+<div class="ds-update-container">
   <h2>Cập nhật điểm cho học sinh</h2>
   {% if messages %}
-    <div class="alert alert-success">
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    </div>
- {% endif %} 
+  <div class="alert alert-success">
+    {% for message in messages %}
+    <p>{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
   <form method="POST">
     {% csrf_token %}
-    {{ form.as_p }}  <!-- Hiển thị các trường trong form -->
-    <button type="submit" class="btn btn-primary">Lưu điểm</button>
+    {{ form.as_p }} <!-- Hiển thị các trường trong form -->
+    <button type="submit" class="btn-submit">Lưu điểm</button>
   </form>
 
   <br>
-  <a href="{% url 'diem' %}">Quay lại danh sách điểm</a>  
+  <a href="{% url 'diem' %}">
+    <button class="btn-back">Quay lại danh sách điểm</button>
+  </a>
+</div>
 {% endblock %}
