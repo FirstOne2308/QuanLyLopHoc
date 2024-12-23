@@ -502,10 +502,10 @@ def xoa_lop_hoc(request, lop_id):
     Trả về: Danh sách các lớp học sau khi xóa
     """
     lop_hoc = get_object_or_404(LopHoc, id = lop_id)
-    nam_hoc = lop_hoc.nam_hoc.nam
     if request.method == 'POST':
         lop_hoc.delete()
-    return redirect(f'/lop-hoc?nam_hoc={nam_hoc}')
+    return redirect(request.META.get('HTTP_REFERER'))  # Redirect lại trang danh sách điểm
+
 
 
 @login_required(login_url='dang-nhap')
